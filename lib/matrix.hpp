@@ -12,23 +12,23 @@ public:
     this->colNum = this->matrix[0].size();
   }
 
-  int getRowNum() const {
+  inline int getRowNum() const {
     return this->rowNum;
   };
 
-  int getColNum() const {
+  inline int getColNum() const {
     return this->colNum;
   };
 
-  TMatrix getMatrix() const {
+  inline TMatrix getMatrix() const {
     return this->matrix;
   };
 
-  T getMatrixElem(int x, int y) const {
+  inline T getMatrixElem(int x, int y) const {
     return this->matrix[x][y];
   };
 
-  void changeElem(int x, int y, T value) {
+  inline void changeElem(int x, int y, T value) {
     this->matrix[x][y] = value;
   }
 
@@ -40,7 +40,7 @@ public:
   std::vector<T> getMatrixCol(int y) {
     if(y >= this->getColNum()) throw "invalid argument";
     std::vector<T> vec;
-    for(size_t i = 0; i < this->getRowNum(); i++)
+    for(size_t i = 0; i < this->getRowNum(); ++i)
       vec.push_back(this->matrix[i][y]);
     
     return vec;
@@ -48,8 +48,8 @@ public:
 
   TMatrix getTranspose() {
     std::unique_ptr<Matrix> pTransposed = std::make_unique<Matrix<T>>(this->getFilledMatrix(0));
-    for(size_t i = 0; i < this->getRowNum(); i++)
-      for(size_t j = 0; j < this->getColNum(); j++)
+    for(size_t i = 0; i < this->getRowNum(); ++i)
+      for(size_t j = 0; j < this->getColNum(); ++j)
         pTransposed->changeElem(i, j, this->getMatrixElem(j, i));
     
     return pTransposed->getMatrix();
@@ -61,9 +61,9 @@ private:
 
   TMatrix getFilledMatrix(int num) {
     TMatrix filled;
-    for(size_t i = 0; i < this->getRowNum(); i++) {
+    for(size_t i = 0; i < this->getRowNum(); ++i) {
       filled.push_back({});     
-      for(size_t j = 0; j < this->getColNum(); j++)
+      for(size_t j = 0; j < this->getColNum(); ++j)
         filled[i].push_back(0);
     }
 
