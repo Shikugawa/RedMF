@@ -3,8 +3,8 @@
 #include <vector>
 #include <array>
 #include <memory>
-#include "lib/matrix.hpp"
-#include "lib/vec.hpp"
+#include "../lib/matrix.hpp"
+#include "../lib/vec.hpp"
 
 template<typename Type> class MatrixFactorization {
   typedef std::vector<std::vector<Type>> TMatrix;
@@ -22,7 +22,7 @@ public:
 
   ~MatrixFactorization() { delete matrix; }
 
-  std::unique_ptr<std::array<TMatrix>> execute () {
+  std::unique_ptr<std::array<TMatrix, 2>> execute () {
     for(size_t u = 0; u < this->matrixRRowNum; u++) {
       for(size_t i = 0; i < this->matrixRColNum; i++) {
         while(true) {
@@ -36,7 +36,7 @@ public:
       }
     }
 
-    return std::make_unique<std::array>TMatrix>>(this->P, this->Q);
+    return std::make_unique<std::array<TMatrix, 2>>(this->P, this->Q);
   }
 
 private:
