@@ -1,3 +1,5 @@
+ // Reference: http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
+
 #include <vector>
 #include <array>
 #include <memory>
@@ -19,7 +21,7 @@ public:
   }
 
   ~MatrixFactorization() { delete matrix; }
-  
+
   std::unique_ptr<std::array<TMatrix>> execute () {
     for(size_t u = 0; u < this->matrixRRowNum; u++) {
       for(size_t i = 0; i < this->matrixRColNum; i++) {
