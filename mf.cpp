@@ -4,11 +4,11 @@
 #include "lib/matrix.hpp"
 #include "lib/vec.hpp"
 
-template<typename Type> class MatrixFactrization {
+template<typename Type> class MatrixFactorization {
   typedef std::vector<std::vector<Type>> TMatrix;
 
 public:
-  MatrixFactrization(const Matrix<Type>* m, double const thereshold, int const dim) {
+  MatrixFactorization(const Matrix<Type>* m, double const thereshold, int const dim) {
     this->matrix = m;
     this->thereshold = thereshold;
     this->dim = dim;
@@ -18,19 +18,23 @@ public:
     Q = std::make_unique<Matrix<Type>>(this->getFilledMatrix(1.0, this->dim, this->matrixRColNum));
   }
 
+  ~MatrixFactorization() { delete matrix; }
+  
   std::unique_ptr<std::array<TMatrix>> execute () {
     for(size_t u = 0; u < this->matrixRRowNum; u++) {
       for(size_t i = 0; i < this->matrixRColNum; i++) {
-        std::vector<Type> p = this->P->getMatrixRow(u);
-        std::vector<Type> q = this->P->getMatrixCol(i);
-        std::vector<Type> expectedr = mul<Type>(p, q);
-        Type error = pow(expectedr - this->matrix->getMatrixElem(u, i), 2);
-        if(error < this->thereshold)
-          return std::make_unique<std::array>TMatrix>>(this->P, this->Q);
-
-        this->update();
+        while(true) {
+          std::vector<Type> p = this->P->getMatrixRow(u);
+          std::vector<Type> q = this->P->getMatrixCol(i);
+          std::vector<Type> expectedr = mul<Type>(p, q);
+          Type error = pow(expectedr - this->matrix->getMatrixElem(u, i), 2);
+          if(error < this->thereshold) continue;
+          this->update(); 
+        }
       }
     }
+
+    return std::make_unique<std::array>TMatrix>>(this->P, this->Q);
   }
 
 private:
@@ -50,7 +54,12 @@ private:
     return filled;
   };
 
-  void update(double const alpha) {
-
+  void update(double const alpha, Type const error, int const u, int const i) {
+    Type currentPValue = this->P->getMatrixElem(u, i);
+    Type currentQValue = this->P->getMatrixElem(u, i);
+    currentPValue += 2*alpha*error*currentQValue;
+    currentQValue += 2*alpha*error*currentPValue;
+    this->P->changeElem(u, i, currentPValue);
+    this->Q->changeElem(u, i, currentQValue);
   }
 };
