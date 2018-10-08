@@ -2,20 +2,21 @@
 #include <exception>
 
 template <typename T>
-std::vector<T> mul(const std::vector<T> a, const std::vector<T> b) {
+T mul(const std::vector<T> a, const std::vector<T> b) {
   int aSize = a.size();
   int bSize = b.size();
 
+  // for(auto& q : b) std::cout << q << std::endl;
+  // for(auto& q : a) std::cout << q << std::endl;
   if(aSize != bSize){
+    std::cout << aSize << std::endl;
+    std::cout << bSize << std::endl;
     throw "operands must be same length";
   } 
 
-  std::vector<T> result;
+  T result = 0;
   for(size_t i = 0; i < aSize; ++i){
-    T ans;
-    for(size_t j = 0; j < bSize; ++j)
-      ans += a[i]*b[j];
-    result.push_back(ans);
+    result += a[i]*b[i];
   }
   return result;
 }
