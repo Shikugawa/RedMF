@@ -15,6 +15,7 @@
     "type_traits": "cpp",
     "typeinfo": "cpp",
     "algorithm": "cpp",
-    "cstdint": "cpp"
+    "cstdint": "cpp",
+    "iosfwd": "cpp"
   }
 }

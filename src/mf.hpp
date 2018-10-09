@@ -24,20 +24,21 @@ public:
 
   ~MatrixFactorization() { delete matrix; }
 
-  TMatrix getPMatrix() {
+  std::shared_ptr<Matrix<Type>> getPMatrix() {
     return this->P;
   }
 
-  TMatrix getQMatrix() {
+  std::shared_ptr<Matrix<Type>> getQMatrix() {
     return this->Q;
   }
 
   void execute (bool const verbose = false) {
     for(size_t u = 0; u < this->matrixRRowNum; u++) {
+      if (verbose) {
+        std::cout << "Optimising user " << u << std::endl;
+      }
+
       for(size_t i = 0; i < this->matrixRColNum; i++) {
-        if (verbose) {
-          std::cout << "Optimising user " << u << " item " << i << std::endl;
-        }
         while(true) {
           std::vector<Type> p = this->P->getMatrixRow(u);
           std::vector<Type> q = this->Q->getMatrixRow(i);
@@ -45,7 +46,7 @@ public:
           Type error = expectedr - this->matrix->getMatrixElem(u, i);
           // std::cout << std::pow(error, 2) << std::endl;
           if(std::pow(error, 2) < this->thereshold) break;
-          this->update(0.0002, error, u, i, p, q);
+          this->update(0.0001, error, u, i, p, q);
         }
       }
     }
@@ -53,7 +54,7 @@ public:
 
 private:
   Matrix<Type>* matrix;
-  std::unique_ptr<Matrix<Type>> P, Q;
+  std::shared_ptr<Matrix<Type>> P, Q;
   double thereshold;
   int dim, matrixRRowNum, matrixRColNum;
 

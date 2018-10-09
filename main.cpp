@@ -1,10 +1,13 @@
 #include <iostream>
+#include <iterator>
 #include <fstream>
 #include <vector>
 #include <string>
 #include <sstream>
 #include <utility>
 #include "src/mf.hpp"
+
+typedef std::vector<std::vector<double>> TMatrix;
 
 std::vector<double> split(std::string const &s, char delimiter) {
   std::vector<double> result;
@@ -18,21 +21,43 @@ std::vector<double> split(std::string const &s, char delimiter) {
   return result;
 } 
 
+void outputCSV(std::string const fileName, TMatrix& m) {
+  std::ofstream fs(fileName);
+
+  for(auto& i: m) {
+    std::ostringstream os;
+    std::copy(i.begin(), i.end(), std::ostream_iterator<std::string>(os, ","));
+    std::string s = os.str();
+    s.erase(s.size() - std::char_traits<char>::length(","));
+    fs << s << std::endl;
+  }
+}
+
 int main(int argc, char const *argv[]) {
-  std::vector<std::vector<double>> d;
-  std::fstream fs("data.csv");
-  std::string line;
-  
-  while(std::getline(fs, line)) {
-    d.push_back(split(line, ','));
+  TMatrix d;
+
+  {
+    std::ifstream fs("./dataset/matrix.csv");
+    std::string line;
+    
+    while(std::getline(fs, line)) {
+      d.push_back(split(line, ','));
+    }
   }
 
   Matrix<double>* m = new Matrix<double>(std::move(d));
   MatrixFactorization<double>* mf = new MatrixFactorization<double>(
-    std::move(m), 0.001, 2 
+    std::move(m), 0.001, 20
   );
 
   mf->execute(true);
+
+  // TMatrix P = mf->getPMatrix();
+  // TMatrix Q = mf->getQMatrix();
+  
+  // outputCSV("P.csv", P);
+  // outputCSV("Q.csv", Q);
+  
   delete mf;
   return 0;
 }
