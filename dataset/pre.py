@@ -7,21 +7,19 @@ users = list(set(list(rating['userId'])))
 movies = list(set(list(movie_df['movieId'])))
 result = []
 
-def getEvaluation(user_id, movie_id):
-  data = rating.query("userId == {0} & movieId == {1}".format(user_id, movie_id)).values
-  if len(data) != 0:
-    return data[0][2]
-  else:
-    return 0.0
+def getEvaluation(user_id):
+  result = { movie: 0.0 for movie in movies }
+  user_evalated_movies = set(rating.query("userId == {0}".format(user_id))['movieId'].values)
+  
+  for movie in user_evalated_movies:
+    result[movie] = rating.query("userId == {0} & movieId == {1}".format(user_id, movie)).values[0][2]
+
+  return list(result.values())
 
 for u in users:
   print("operating user {0}".format(u))
-  ratings_per_user = []
-  for i in movies:
-    ratings_per_user.append(getEvaluation(u, i))
-  result.append(ratings_per_user)
+  result.append(getEvaluation(u))
 
 with open('matrix.csv', 'w') as file:
   writer = csv.writer(file, lineterminator='\n')
   writer.writerows(result)
-  
