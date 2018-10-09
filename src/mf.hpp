@@ -38,12 +38,12 @@ public:
         if (verbose) {
           std::cout << "Optimising user " << u << " item " << i << std::endl;
         }
-
         while(true) {
           std::vector<Type> p = this->P->getMatrixRow(u);
           std::vector<Type> q = this->Q->getMatrixRow(i);
           Type expectedr = mul<Type>(p, q);
           Type error = expectedr - this->matrix->getMatrixElem(u, i);
+          // std::cout << std::pow(error, 2) << std::endl;
           if(std::pow(error, 2) < this->thereshold) break;
           this->update(0.0002, error, u, i, p, q);
         }

@@ -6,8 +6,6 @@ T mul(const std::vector<T> a, const std::vector<T> b) {
   int aSize = a.size();
   int bSize = b.size();
 
-  // for(auto& q : b) std::cout << q << std::endl;
-  // for(auto& q : a) std::cout << q << std::endl;
   if(aSize != bSize){
     std::cout << aSize << std::endl;
     std::cout << bSize << std::endl;
