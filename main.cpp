@@ -1,10 +1,10 @@
 #include <iostream>
-#include <iterator>
 #include <fstream>
 #include <vector>
 #include <string>
 #include <sstream>
 #include <utility>
+#include <iterator>
 #include "src/mf.hpp"
 
 typedef std::vector<std::vector<double>> TMatrix;
@@ -26,7 +26,7 @@ void outputCSV(std::string const fileName, TMatrix& m) {
 
   for(auto& i: m) {
     std::ostringstream os;
-    std::copy(i.begin(), i.end(), std::ostream_iterator<std::string>(os, ","));
+    std::copy(i.begin(), i.end(), std::ostream_iterator<double>(os, ","));
     std::string s = os.str();
     s.erase(s.size() - std::char_traits<char>::length(","));
     fs << s << std::endl;
@@ -52,11 +52,11 @@ int main(int argc, char const *argv[]) {
 
   mf->execute(true);
 
-  // TMatrix P = mf->getPMatrix();
-  // TMatrix Q = mf->getQMatrix();
+  TMatrix P = mf->getPMatrix();
+  TMatrix Q = mf->getQMatrix();
   
-  // outputCSV("P.csv", P);
-  // outputCSV("Q.csv", Q);
+  outputCSV("P.csv", P);
+  outputCSV("Q.csv", Q);
   
   delete mf;
   return 0;

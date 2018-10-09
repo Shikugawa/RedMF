@@ -16,6 +16,7 @@
     "typeinfo": "cpp",
     "algorithm": "cpp",
     "cstdint": "cpp",
-    "iosfwd": "cpp"
+    "iosfwd": "cpp",
+    "memory": "cpp"
   }
 }

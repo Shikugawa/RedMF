@@ -18,18 +18,18 @@ public:
     this->dim = dim;
     this->matrixRRowNum = this->matrix->getRowNum();
     this->matrixRColNum = this->matrix->getColNum();
-    P = std::make_unique<Matrix<Type>>(this->getFilledMatrix(1.0, this->matrixRRowNum, this->dim));
-    Q = std::make_unique<Matrix<Type>>(this->getFilledMatrix(1.0, this->matrixRColNum, this->dim));
+    this->P = new Matrix<Type>(this->getFilledMatrix(1.0, this->matrixRRowNum, this->dim));
+    this->Q = new Matrix<Type>(this->getFilledMatrix(1.0, this->matrixRColNum, this->dim));
   }
 
   ~MatrixFactorization() { delete matrix; }
 
-  std::shared_ptr<Matrix<Type>> getPMatrix() {
-    return this->P;
+  TMatrix getPMatrix() {
+    return this->P->getMatrix();
   }
 
-  std::shared_ptr<Matrix<Type>> getQMatrix() {
-    return this->Q;
+  TMatrix getQMatrix() {
+    return this->Q->getMatrix();
   }
 
   void execute (bool const verbose = false) {
@@ -53,8 +53,7 @@ public:
   }
 
 private:
-  Matrix<Type>* matrix;
-  std::shared_ptr<Matrix<Type>> P, Q;
+  Matrix<Type> *matrix, *P, *Q;
   double thereshold;
   int dim, matrixRRowNum, matrixRColNum;
 
