@@ -16,6 +16,13 @@ public:
     tMatrixToEigenMatrix(R);
   }
 
+  // Random Matrix when initialzation
+  Matrix(int rowSize, int colSize) {
+    rowNum = rowSize;
+    colNum = colSize;
+    matrix = std::make_unique<Eigen::MatrixXd>(Eigen::MatrixXd::Random(rowNum, colNum));
+  }
+
   inline TMatrix getMatrix() {
     return eigenMatrixToSTLVector(colNum, rowNum);
   };

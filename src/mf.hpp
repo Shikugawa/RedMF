@@ -14,12 +14,12 @@ template<typename Type> class MatrixFactorization {
 public:
   MatrixFactorization(Matrix<Type>* m, double const thereshold, int const dim) {
     matrix = m;
-    thereshold = thereshold;
-    dim = dim;
+    this->thereshold = thereshold;
+    this->dim = dim;
     matrixRRowNum = matrix->rowNum;
     matrixRColNum = matrix->colNum;
-    P = new Matrix<Type>(getFilledMatrix(1.0, matrixRRowNum, dim));
-    Q = new Matrix<Type>(getFilledMatrix(1.0, matrixRColNum, dim));
+    P = new Matrix<Type>(matrixRRowNum, dim);
+    Q = new Matrix<Type>(matrixRColNum, dim);
   }
 
   ~MatrixFactorization() { 
@@ -47,7 +47,7 @@ public:
           Type expectedr = mul<Type>(p, q);
           Type error = expectedr - matrix->getMatrixElem(u, i);
           if(std::pow(error, 2) < thereshold) break;
-          update(0.0001, error, u, i, p, q);
+          update(0.01, error, u, i, p, q);
         }
       }
     }
