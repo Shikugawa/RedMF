@@ -8,20 +8,13 @@ template <typename T> class Matrix {
 
 public:
   std::shared_ptr<Eigen::MatrixXd> matrix;
+  int colNum, rowNum;
 
   Matrix(TMatrix R) {
     rowNum = R.size();
     colNum = R[0].size();
     matrix = std::make_shared<Eigen::MatrixXd>(Eigen::Map<Eigen::MatrixXd>(&R[0][0], rowNum, colNum));
   }
-
-  inline int getRowNum() const {
-    return rowNum;
-  };
-
-  inline int getColNum() const {
-    return colNum;
-  };
 
   inline TMatrix getMatrix() {
     return eigenMatrixToSTLVector(colNum, rowNum);
@@ -38,12 +31,12 @@ public:
   }
 
   std::vector<T> getMatrixRow(int x) {
-    if(x >= getRowNum()) throw "invalid argument";
+    if(x >= rowNum) throw "invalid argument";
     return eigenVectorToSTLVector((Eigen::VectorXd)matrix.get()->row(x), rowNum);
   }
 
   std::vector<T> getMatrixCol(int y) {
-    if(y >= getColNum()) throw "invalid argument";
+    if(y >= colNum) throw "invalid argument";
     return eigenVectorToSTLVector((Eigen::VectorXd)matrix.get()->col(y), colNum);
   };
 
@@ -60,13 +53,11 @@ public:
   };
   
 private:
-  int colNum, rowNum;
-
   TMatrix getFilledMatrix(int num) {
     TMatrix filled;
-    for(size_t i = 0; i < getRowNum(); ++i) {
+    for(size_t i = 0; i < rowNum; ++i) {
       filled.push_back({});     
-      for(size_t j = 0; j < getColNum(); ++j)
+      for(size_t j = 0; j < colNum; ++j)
         filled[i].push_back(0);
     }
 

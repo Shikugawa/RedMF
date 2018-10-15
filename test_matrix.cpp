@@ -27,9 +27,9 @@ int main(void){
   
   std::unique_ptr<Matrix<double>> pm = std::make_unique<Matrix<double>>(vtr);
   std::cout << "colnum" << std::endl;
-  std::cout << pm->getColNum() << std::endl;
+  std::cout << pm->colNum << std::endl;
   std::cout << "rownum" << std::endl;
-  std::cout << pm->getRowNum() << std::endl;
+  std::cout << pm->rowNum << std::endl;
   std::cout << "expected 2" << std::endl;
   std::cout << pm->getMatrixElem(0, 1) << std::endl;
   pm->changeElem(0, 0, 100);

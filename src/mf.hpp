@@ -16,8 +16,8 @@ public:
     this->matrix = m;
     this->thereshold = thereshold;
     this->dim = dim;
-    this->matrixRRowNum = this->matrix->getRowNum();
-    this->matrixRColNum = this->matrix->getColNum();
+    this->matrixRRowNum = this->matrix->rowNum;
+    this->matrixRColNum = this->matrix->colNum;
     this->P = new Matrix<Type>(this->getFilledMatrix(1.0, this->matrixRRowNum, this->dim));
     this->Q = new Matrix<Type>(this->getFilledMatrix(1.0, this->matrixRColNum, this->dim));
   }
