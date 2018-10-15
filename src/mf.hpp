@@ -13,41 +13,41 @@ template<typename Type> class MatrixFactorization {
 
 public:
   MatrixFactorization(Matrix<Type>* m, double const thereshold, int const dim) {
-    this->matrix = m;
-    this->thereshold = thereshold;
-    this->dim = dim;
-    this->matrixRRowNum = this->matrix->rowNum;
-    this->matrixRColNum = this->matrix->colNum;
-    this->P = new Matrix<Type>(this->getFilledMatrix(1.0, this->matrixRRowNum, this->dim));
-    this->Q = new Matrix<Type>(this->getFilledMatrix(1.0, this->matrixRColNum, this->dim));
+    matrix = m;
+    thereshold = thereshold;
+    dim = dim;
+    matrixRRowNum = matrix->rowNum;
+    matrixRColNum = matrix->colNum;
+    P = new Matrix<Type>(getFilledMatrix(1.0, matrixRRowNum, dim));
+    Q = new Matrix<Type>(getFilledMatrix(1.0, matrixRColNum, dim));
   }
 
   ~MatrixFactorization() { 
-    delete this->matrix; 
+    delete matrix; 
   }
 
   TMatrix getPMatrix() {
-    return this->P->getMatrix();
+    return P->getMatrix();
   }
 
   TMatrix getQMatrix() {
-    return this->Q->getMatrix();
+    return Q->getMatrix();
   }
 
   void execute (bool const verbose = false) {
-    for(size_t u = 0; u < this->matrixRRowNum; u++) {
+    for(size_t u = 0; u < matrixRRowNum; u++) {
       if (verbose) {
         std::cout << "Optimising user " << u << std::endl;
       }
 
-      for(size_t i = 0; i < this->matrixRColNum; i++) {
+      for(size_t i = 0; i < matrixRColNum; i++) {
         while(true) {
-          std::vector<Type> p = this->P->getMatrixRow(u);
-          std::vector<Type> q = this->Q->getMatrixRow(i);
+          std::vector<Type> p = P->getMatrixRow(u);
+          std::vector<Type> q = Q->getMatrixRow(i);
           Type expectedr = mul<Type>(p, q);
-          Type error = expectedr - this->matrix->getMatrixElem(u, i);
-          if(std::pow(error, 2) < this->thereshold) break;
-          this->update(0.0001, error, u, i, p, q);
+          Type error = expectedr - matrix->getMatrixElem(u, i);
+          if(std::pow(error, 2) < thereshold) break;
+          update(0.0001, error, u, i, p, q);
         }
       }
     }
@@ -72,12 +72,12 @@ private:
   void update(double const alpha, Type const error, 
               int const u, int const i, 
               std::vector<Type> p, std::vector<Type> q) {
-    for(size_t j = 0; j < this->dim; ++j) {
+    for(size_t j = 0; j < dim; ++j) {
       auto& tmp = p[j];
       p[j] -= 2*alpha*error*q[j];
       q[j] -= 2*alpha*error*tmp;
-      this->P->changeElem(u, j, p[j]);
-      this->Q->changeElem(i, j, q[j]);
+      P->changeElem(u, j, p[j]);
+      Q->changeElem(i, j, q[j]);
     }
   }
 };
