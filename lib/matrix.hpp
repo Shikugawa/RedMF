@@ -3,8 +3,6 @@
 #include <memory>
 #include <exception>
 
-#include <iostream>
-
 template <typename T> class Matrix {
   typedef std::vector<std::vector<T>> TMatrix;
 
@@ -23,8 +21,6 @@ public:
   };
 
   inline T getMatrixElem(int x, int y) const {
-    std::cout << matrix->row(0) << std::endl;
-    std::cout << matrix->row(1) << std::endl;
     auto tmp = matrix.get();
     return matrix->coeff(x, y);
   };
@@ -46,10 +42,10 @@ public:
 
   TMatrix getTranspose() {
     TMatrix pTransposed;
-    for(size_t i = 0; i < rowNum; i++) {
+    for(size_t i = 0; i < colNum; i++) {
       std::vector<T> v;
-      for(size_t j = 0; j < colNum; j++) {
-        v.push_back(matrix.get()->coeff(j, i));
+      for(size_t j = 0; j < rowNum; j++) {
+        v.push_back(matrix->coeff(j, i));
       }
       pTransposed.push_back(v);
     }
