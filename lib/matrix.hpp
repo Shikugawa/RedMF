@@ -1,3 +1,4 @@
+#include <eigen3/Eigen/Core>
 #include <vector>
 #include <memory>
 #include <exception>
@@ -6,67 +7,89 @@ template <typename T> class Matrix {
   typedef std::vector<std::vector<T>> TMatrix;
 
 public:
-  Matrix(std::vector<std::vector<T>> R) {
-    this->matrix = R;
-    this->rowNum = this->matrix.size();
-    this->colNum = this->matrix[0].size();
+  std::shared_ptr<Eigen::MatrixXd> matrix;
+
+  Matrix(TMatrix R) {
+    rowNum = R.size();
+    colNum = R[0].size();
+    matrix = std::make_shared<Eigen::MatrixXd>(Eigen::Map<Eigen::MatrixXd>(&R[0][0], rowNum, colNum));
   }
 
   inline int getRowNum() const {
-    return this->rowNum;
+    return rowNum;
   };
 
   inline int getColNum() const {
-    return this->colNum;
+    return colNum;
   };
 
-  inline TMatrix getMatrix() const {
-    return this->matrix;
+  inline TMatrix getMatrix() {
+    return eigenMatrixToSTLVector(colNum, rowNum);
   };
 
   inline T getMatrixElem(int x, int y) const {
-    return this->matrix[x][y];
+    auto tmp = matrix.get();
+    return tmp->coeff(x, y);
   };
 
   inline void changeElem(int x, int y, T value) {
-    this->matrix[x][y] = value;
+    auto& tmp = *matrix;
+    tmp(x, y) = value;
   }
 
-  std::vector<T> getMatrixRow(int x) const {
-    if(x >= this->getRowNum()) throw "invalid argument";
-    return this->matrix[x];
+  std::vector<T> getMatrixRow(int x) {
+    if(x >= getRowNum()) throw "invalid argument";
+    return eigenVectorToSTLVector((Eigen::VectorXd)matrix.get()->row(x), rowNum);
   }
 
   std::vector<T> getMatrixCol(int y) {
-    if(y >= this->getColNum()) throw "invalid argument";
-    std::vector<T> vec;
-    for(size_t i = 0; i < this->getRowNum(); ++i)
-      vec.push_back(this->matrix[i][y]);
-    
-    return vec;
+    if(y >= getColNum()) throw "invalid argument";
+    return eigenVectorToSTLVector((Eigen::VectorXd)matrix.get()->col(y), colNum);
   };
 
   TMatrix getTranspose() {
-    std::unique_ptr<Matrix> pTransposed = std::make_unique<Matrix<T>>(this->getFilledMatrix(0));
-    for(size_t i = 0; i < this->getRowNum(); ++i)
-      for(size_t j = 0; j < this->getColNum(); ++j)
-        pTransposed->changeElem(i, j, this->getMatrixElem(j, i));
-    
-    return pTransposed->getMatrix();
+    TMatrix pTransposed;
+    for(size_t i = 0; i < rowNum; i++) {
+      std::vector<T> v;
+      for(size_t j = 0; j < colNum; j++) {
+        v.push_back(matrix.get()->coeff(j, i));
+      }
+      pTransposed.push_back(v);
+    }
+    return pTransposed;
   };
   
 private:
-  TMatrix matrix;
   int colNum, rowNum;
 
   TMatrix getFilledMatrix(int num) {
     TMatrix filled;
-    for(size_t i = 0; i < this->getRowNum(); ++i) {
+    for(size_t i = 0; i < getRowNum(); ++i) {
       filled.push_back({});     
-      for(size_t j = 0; j < this->getColNum(); ++j)
+      for(size_t j = 0; j < getColNum(); ++j)
         filled[i].push_back(0);
     }
 
     return filled;
   };
+
+  TMatrix eigenMatrixToSTLVector(int col, int row) {
+    TMatrix result;
+    for(size_t i = 0; i < row; i++) {
+      std::vector<T> v;
+      for(size_t j = 0; j < col; j++) {
+        v.push_back(matrix.get()->coeff(i, j));
+      }
+      result.push_back(v);
+    }
+    return result;
+  }
+
+  std::vector<T> eigenVectorToSTLVector(Eigen::VectorXd const vector, int size) {
+    std::vector<T> result;
+    for(size_t i = 0; i < size; i++) {
+      result.push_back(vector(i));
+    }
+    return result;
+  }
 };

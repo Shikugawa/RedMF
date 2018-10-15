@@ -1,11 +1,11 @@
+#include "lib/matrix.hpp"
 #include <iostream>
-#include "matrix/matrix.hpp"
 #include <vector>
 #include <memory>
 
-typedef std::vector<std::vector<int>> intMatrix;
+typedef std::vector<std::vector<double>> doubleMatrix;
 
-void printMatrix(const intMatrix im){
+void printMatrix(const doubleMatrix im){
   for(auto& i : im){
     for(auto& j: i){
       std::cout << j << std::endl;
@@ -20,12 +20,12 @@ template<typename T> void printVector(const std::vector<T> v){
 }
 
 int main(void){
-  intMatrix vtr = {
-      {1, 2},
-      {3, 4}
-    };
+  doubleMatrix vtr = {
+    {1.0, 2.0},
+    {3.0, 4.0}
+  };
   
-  std::unique_ptr<Matrix<int>> pm = std::make_unique<Matrix<int>>(vtr);
+  std::unique_ptr<Matrix<double>> pm = std::make_unique<Matrix<double>>(vtr);
   std::cout << "colnum" << std::endl;
   std::cout << pm->getColNum() << std::endl;
   std::cout << "rownum" << std::endl;
@@ -36,9 +36,9 @@ int main(void){
   std::cout << "expected 100, 2, 3, 4" << std::endl;
   printMatrix(pm->getMatrix());
   std::cout << "expected 100, 2" << std::endl;
-  printVector<int>(pm->getMatrixRow(0));
+  printVector<double>(pm->getMatrixRow(0));
   std::cout << "expected 100, 3" << std::endl;
-  printVector<int>(pm->getMatrixCol(0));
+  printVector<double>(pm->getMatrixCol(0));
   std::cout << "expected 100, 3, 2, 4" << std::endl;
   printMatrix(pm->getTranspose());
 }

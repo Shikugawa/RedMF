@@ -22,7 +22,9 @@ public:
     this->Q = new Matrix<Type>(this->getFilledMatrix(1.0, this->matrixRColNum, this->dim));
   }
 
-  ~MatrixFactorization() { delete matrix; }
+  ~MatrixFactorization() { 
+    delete this->matrix; 
+  }
 
   TMatrix getPMatrix() {
     return this->P->getMatrix();
@@ -44,7 +46,6 @@ public:
           std::vector<Type> q = this->Q->getMatrixRow(i);
           Type expectedr = mul<Type>(p, q);
           Type error = expectedr - this->matrix->getMatrixElem(u, i);
-          // std::cout << std::pow(error, 2) << std::endl;
           if(std::pow(error, 2) < this->thereshold) break;
           this->update(0.0001, error, u, i, p, q);
         }
