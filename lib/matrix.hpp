@@ -3,6 +3,8 @@
 #include <memory>
 #include <exception>
 
+#include <iostream>
+
 template <typename T> class Matrix {
   typedef std::vector<std::vector<T>> TMatrix;
 
@@ -13,7 +15,7 @@ public:
   Matrix(TMatrix R) {
     rowNum = R.size();
     colNum = R[0].size();
-    matrix = std::make_shared<Eigen::MatrixXd>(Eigen::Map<Eigen::MatrixXd>(&R[0][0], rowNum, colNum));
+    tMatrixToEigenMatrix(R);
   }
 
   inline TMatrix getMatrix() {
@@ -21,8 +23,10 @@ public:
   };
 
   inline T getMatrixElem(int x, int y) const {
+    std::cout << matrix->row(0) << std::endl;
+    std::cout << matrix->row(1) << std::endl;
     auto tmp = matrix.get();
-    return tmp->coeff(x, y);
+    return matrix->coeff(x, y);
   };
 
   inline void changeElem(int x, int y, T value) {
@@ -32,12 +36,12 @@ public:
 
   std::vector<T> getMatrixRow(int x) {
     if(x >= rowNum) throw "invalid argument";
-    return eigenVectorToSTLVector((Eigen::VectorXd)matrix.get()->row(x), rowNum);
+    return eigenVectorToSTLVector((Eigen::VectorXd)matrix->row(x), colNum);
   }
 
   std::vector<T> getMatrixCol(int y) {
     if(y >= colNum) throw "invalid argument";
-    return eigenVectorToSTLVector((Eigen::VectorXd)matrix.get()->col(y), colNum);
+    return eigenVectorToSTLVector((Eigen::VectorXd)matrix->col(y), rowNum);
   };
 
   TMatrix getTranspose() {
@@ -76,11 +80,22 @@ private:
     return result;
   }
 
-  std::vector<T> eigenVectorToSTLVector(Eigen::VectorXd const vector, int size) {
+  std::vector<T> eigenVectorToSTLVector(Eigen::VectorXd vector, int size) {
     std::vector<T> result;
     for(size_t i = 0; i < size; i++) {
-      result.push_back(vector(i));
+      result.push_back(vector.coeff(i));
     }
+
     return result;
+  }
+
+  void tMatrixToEigenMatrix(TMatrix m) {
+    std::unique_ptr<Eigen::MatrixXd> tmpMatrix = std::make_unique<Eigen::MatrixXd>(rowNum, colNum);
+    for(size_t i = 0; i < rowNum; i++) {
+      for(size_t j = 0; j < colNum; j++) {
+        tmpMatrix->coeffRef(i, j) = m[i][j];
+      }
+    }
+    matrix = std::move(tmpMatrix);
   }
 };
