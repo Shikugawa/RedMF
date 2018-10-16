@@ -17,6 +17,7 @@
     "algorithm": "cpp",
     "cstdint": "cpp",
     "iosfwd": "cpp",
-    "memory": "cpp"
+    "memory": "cpp",
+    "ostream": "cpp"
   }
 }

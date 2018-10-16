@@ -5,6 +5,10 @@
 #include "mfbase.hpp"
 #include "../lib/vec.hpp"
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 template<typename Type> 
 class MatrixFactorization : public MatrixFactorizationBase<Type> {
   using TMatrix = std::vector<std::vector<Type>>;
@@ -27,12 +31,13 @@ public:
     Q = std::make_unique<Matrix<Type>>(matrixRColNum, dim);
   }
 
-  void execute (bool const verbose = false) {
+  void execute(bool const verbose = false) {
+    #pragma omp parallel for
     for(size_t u = 0; u < matrixRRowNum; u++) {
       if (verbose) {
-        std::cout << "Optimising user " << u << std::endl;
+        std::cout << "Optimising user " << u << std::endl; // 並列化したら表示がバグる
       }
-
+      #pragma omp parallel for
       for(size_t i = 0; i < matrixRColNum; i++) {
         while(true) {
           std::vector<Type> p = P->getMatrixRow(u);
