@@ -1,33 +1,30 @@
  // Reference: http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
 
-#include <vector>
-#include <array>
-#include <memory>
 #include <cmath>
 #include <iostream>
-#include "../lib/matrix.hpp"
+#include "mfbase.hpp"
 #include "../lib/vec.hpp"
 
-template<typename Type> class MatrixFactorization {
+template<typename Type> 
+class MatrixFactorization : public MatrixFactorizationBase<Type> {
   typedef std::vector<std::vector<Type>> TMatrix;
+  using MatrixFactorizationBase<Type>::matrix;
+  using MatrixFactorizationBase<Type>::P;
+  using MatrixFactorizationBase<Type>::Q;
+  using MatrixFactorizationBase<Type>::dim;
+  using MatrixFactorizationBase<Type>::thereshold;
+  using MatrixFactorizationBase<Type>::matrixRColNum;
+  using MatrixFactorizationBase<Type>::matrixRRowNum;
 
 public:
-  MatrixFactorization(std::unique_ptr<Matrix<Type>> m, double const thereshold, int const dim) {
+  MatrixFactorization(std::unique_ptr<Matrix<Type>> m, double const thd, int const d) {
     matrix = std::move(m);
-    this->thereshold = thereshold;
-    this->dim = dim;
+    thereshold = thd;
+    dim = d;
     matrixRRowNum = matrix->rowNum;
     matrixRColNum = matrix->colNum;
     P = std::make_unique<Matrix<Type>>(matrixRRowNum, dim);
     Q = std::make_unique<Matrix<Type>>(matrixRColNum, dim);
-  }
-
-  TMatrix getPMatrix() {
-    return P->getMatrix();
-  }
-
-  TMatrix getQMatrix() {
-    return Q->getMatrix();
   }
 
   void execute (bool const verbose = false) {
@@ -48,22 +45,6 @@ public:
       }
     }
   }
-
-private:
-  std::unique_ptr<Matrix<Type>> matrix, P, Q;
-  double thereshold;
-  int dim, matrixRRowNum, matrixRColNum;
-
-  TMatrix getFilledMatrix(Type const value, int const rowNum, int const colNum) {
-    TMatrix filled;
-    for(size_t i = 0; i < rowNum; ++i) {
-      filled.push_back({});     
-      for(size_t j = 0; j < colNum; ++j)
-        filled[i].push_back(value);
-    }
-
-    return filled;
-  };
 
   void update(double const alpha, Type const error, 
               int const u, int const i, 
