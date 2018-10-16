@@ -12,18 +12,14 @@ template<typename Type> class MatrixFactorization {
   typedef std::vector<std::vector<Type>> TMatrix;
 
 public:
-  MatrixFactorization(Matrix<Type>* m, double const thereshold, int const dim) {
-    matrix = m;
+  MatrixFactorization(std::unique_ptr<Matrix<Type>> m, double const thereshold, int const dim) {
+    matrix = std::move(m);
     this->thereshold = thereshold;
     this->dim = dim;
     matrixRRowNum = matrix->rowNum;
     matrixRColNum = matrix->colNum;
-    P = new Matrix<Type>(matrixRRowNum, dim);
-    Q = new Matrix<Type>(matrixRColNum, dim);
-  }
-
-  ~MatrixFactorization() { 
-    delete matrix; 
+    P = std::make_unique<Matrix<Type>>(matrixRRowNum, dim);
+    Q = std::make_unique<Matrix<Type>>(matrixRColNum, dim);
   }
 
   TMatrix getPMatrix() {
@@ -54,7 +50,7 @@ public:
   }
 
 private:
-  Matrix<Type> *matrix, *P, *Q;
+  std::unique_ptr<Matrix<Type>> matrix, P, Q;
   double thereshold;
   int dim, matrixRRowNum, matrixRColNum;
 

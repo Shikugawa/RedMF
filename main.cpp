@@ -45,9 +45,8 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  Matrix<double>* m = new Matrix<double>(std::move(d));
   MatrixFactorization<double>* mf = new MatrixFactorization<double>(
-    std::move(m), 0.001, 20
+    std::make_unique<Matrix<double>>(d), 0.001, 20
   );
 
   mf->execute(true);
