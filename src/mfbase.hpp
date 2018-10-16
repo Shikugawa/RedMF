@@ -4,7 +4,7 @@
 
 template<typename Type> 
 class MatrixFactorizationBase {
-  typedef std::vector<std::vector<Type>> TMatrix;
+  using TMatrix = std::vector<std::vector<Type>>;
 
 public:
   std::unique_ptr<Matrix<Type>> matrix, P, Q;
@@ -21,6 +21,10 @@ public:
 
   virtual void execute (bool const verbose = false) = 0;
 
+  virtual void update(double const alpha, Type const error, 
+              int const u, int const i, 
+              std::vector<Type> p, std::vector<Type> q) = 0;
+
   TMatrix getFilledMatrix(Type const value, int const rowNum, int const colNum) {
     TMatrix filled;
     for(size_t i = 0; i < rowNum; ++i) {
@@ -31,9 +35,5 @@ public:
 
     return filled;
   };
-
-  virtual void update(double const alpha, Type const error, 
-              int const u, int const i, 
-              std::vector<Type> p, std::vector<Type> q) = 0;
 };
 

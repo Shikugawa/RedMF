@@ -7,7 +7,7 @@
 #include <iterator>
 #include "src/mf.hpp"
 
-typedef std::vector<std::vector<double>> TMatrix;
+using TMatrix = std::vector<std::vector<double>>;
 
 std::vector<double> split(std::string const &s, char delimiter) {
   std::vector<double> result;
@@ -45,10 +45,10 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  MatrixFactorization<double>* mf = new MatrixFactorization<double>(
+  std::unique_ptr<MatrixFactorization<double>> mf = std::make_unique<MatrixFactorization<double>>(
     std::make_unique<Matrix<double>>(d), 0.001, 20
   );
-
+ 
   mf->execute(true);
 
   TMatrix P = mf->getPMatrix();
@@ -57,6 +57,5 @@ int main(int argc, char const *argv[]) {
   outputCSV("P.csv", P);
   outputCSV("Q.csv", Q);
   
-  delete mf;
   return 0;
 }

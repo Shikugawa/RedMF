@@ -4,7 +4,7 @@
 #include <exception>
 
 template <typename T> class Matrix {
-  typedef std::vector<std::vector<T>> TMatrix;
+  using TMatrix = std::vector<std::vector<T>>;
 
 public:
   std::shared_ptr<Eigen::MatrixXd> matrix;

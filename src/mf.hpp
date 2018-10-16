@@ -7,7 +7,7 @@
 
 template<typename Type> 
 class MatrixFactorization : public MatrixFactorizationBase<Type> {
-  typedef std::vector<std::vector<Type>> TMatrix;
+  using TMatrix = std::vector<std::vector<Type>>;
   using MatrixFactorizationBase<Type>::matrix;
   using MatrixFactorizationBase<Type>::P;
   using MatrixFactorizationBase<Type>::Q;
@@ -40,7 +40,7 @@ public:
           Type expectedr = mul<Type>(p, q);
           Type error = expectedr - matrix->getMatrixElem(u, i);
           if(std::pow(error, 2) < thereshold) break;
-          update(0.01, error, u, i, p, q);
+          update(0.001, error, u, i, p, q);
         }
       }
     }
