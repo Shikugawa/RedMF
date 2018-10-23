@@ -45,17 +45,19 @@ int main(int argc, char const *argv[]) {
     }
   }
 
+  
   std::unique_ptr<MatrixFactorization<double>> mf = std::make_unique<MatrixFactorization<double>>(
-    std::make_unique<Matrix<double>>(d), 0.001, 20
+    std::make_unique<Matrix<double>>(d), 0.001, 2
   );
  
   mf->execute(true);
 
   TMatrix P = mf->getPMatrix();
   TMatrix Q = mf->getQMatrix();
-  
+
   outputCSV("P.csv", P);
   outputCSV("Q.csv", Q);
   
+  std::cout << mf->RMSE() << std::endl;
   return 0;
 }

@@ -51,6 +51,22 @@ public:
     }
   }
 
+  double RMSE() {
+    double sum = 0;
+    
+    for(size_t i = 0; i < matrix->rowNum; ++i) {
+      for(size_t j = 0; j < matrix->colNum; ++j) {
+        double s = 0;
+        for(size_t k = 0; k < dim; ++k) {
+          s += P->getMatrix()[i][k] * Q->getMatrix()[k][j];
+        }
+        sum += s;
+      }
+    }
+
+    return std::sqrt(sum / (matrix->rowNum * matrix->colNum));
+  }
+
   void update(double const alpha, Type const error, 
               int const u, int const i, 
               std::vector<Type> p, std::vector<Type> q) {
