@@ -53,11 +53,7 @@ public:
 
   void execute(int const iteration, bool const verbose = false) {
     for(size_t itr = 0; itr < iteration; ++itr) {
-      if (verbose) {
-        std::cout << "=====================================================" << std::endl;
-        std::cout << "Iteration: " << itr + 1 << std::endl;
-      }
-
+      double rmse = 0;
       #pragma omp parallel for
       for(size_t u = 0; u < matrixRRowNum; ++u) {
         #pragma omp parallel for
@@ -66,28 +62,18 @@ public:
           std::vector<Type> q = Q->getMatrixRow(i);
           Type expectedr = mul<Type>(p, q);
           Type error = expectedr - matrix->getMatrixElem(u, i);
+          rmse += std::pow(error, 2);
           update(0.001, error, u, i, p, q);
         }
       }
 
-      std::cout << "RMSE: " << RMSE() << std::endl;
-    }
-  }
-
-  double RMSE() {
-    double sum = 0;
-    
-    for(size_t i = 0; i < matrix->rowNum; ++i) {
-      for(size_t j = 0; j < matrix->colNum; ++j) {
-        double s = 0;
-        for(size_t k = 0; k < dim; ++k) {
-          s += P->getMatrix()[i][k] * Q->getMatrix()[k][j];
-        }
-        sum += s;
+      rmse = std::sqrt(rmse / (matrix->colNum * matrix->rowNum));
+      if (verbose) {
+        std::cout << "=====================================================" << std::endl;
+        std::cout << "Iteration: " << itr + 1 << std::endl;
+        std::cout << "RMSE: " << rmse << std::endl;
       }
     }
-
-    return std::sqrt(sum / (matrix->rowNum * matrix->colNum));
   }
 
   void update(double const alpha, Type const error, 

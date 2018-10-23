@@ -5,7 +5,7 @@
 
 typedef std::vector<std::vector<double>> TMatrix;
 
-void printMatrix(const doubleMatrix im){
+void printMatrix(const TMatrix im){
   for(auto& i : im){
     for(auto& j: i){
       std::cout << j << std::endl;

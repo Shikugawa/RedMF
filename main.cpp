@@ -57,7 +57,6 @@ int main(int argc, char const *argv[]) {
 
   outputCSV("P.csv", P);
   outputCSV("Q.csv", Q);
-  
-  std::cout << mf->RMSE() << std::endl;
+
   return 0;
 }
