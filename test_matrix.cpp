@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 
-typedef std::vector<std::vector<double>> doubleMatrix;
+typedef std::vector<std::vector<double>> TMatrix;
 
 void printMatrix(const doubleMatrix im){
   for(auto& i : im){
@@ -20,9 +20,12 @@ template<typename T> void printVector(const std::vector<T> v){
 }
 
 int main(void){
-  doubleMatrix vtr = {
-    {1.0, 2.0, 8.0},
-    {3.0, 4.0, 5.0}
+  TMatrix vtr = {
+    {1.0, 4.2, 0.0, 1.9, 2.3},
+    {2.3, 5.6, 6.3, 0.0, 0.0},
+    {0.0, 0.0, 2.5, 2.3, 0.0},
+    {5.2, 1.3, 2.5, 0.0, 2.4},
+    {0.0, 0.0, 0.0, 2.3, 2.6}
   };
   
   std::unique_ptr<Matrix<double>> pm = std::make_unique<Matrix<double>>(vtr);

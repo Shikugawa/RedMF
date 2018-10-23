@@ -51,6 +51,29 @@ public:
     }
   }
 
+  void execute(int const iteration, bool const verbose = false) {
+    for(size_t itr = 0; itr < iteration; ++itr) {
+      if (verbose) {
+        std::cout << "=====================================================" << std::endl;
+        std::cout << "Iteration: " << itr + 1 << std::endl;
+      }
+
+      #pragma omp parallel for
+      for(size_t u = 0; u < matrixRRowNum; ++u) {
+        #pragma omp parallel for
+        for(size_t i = 0; i < matrixRColNum; ++i) {
+          std::vector<Type> p = P->getMatrixRow(u);
+          std::vector<Type> q = Q->getMatrixRow(i);
+          Type expectedr = mul<Type>(p, q);
+          Type error = expectedr - matrix->getMatrixElem(u, i);
+          update(0.001, error, u, i, p, q);
+        }
+      }
+
+      std::cout << "RMSE: " << RMSE() << std::endl;
+    }
+  }
+
   double RMSE() {
     double sum = 0;
     
