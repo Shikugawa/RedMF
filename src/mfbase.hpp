@@ -2,8 +2,8 @@
 #include <vector>
 #include <memory>
 
-template<typename Type> 
-class MatrixFactorizationBase {
+template<typename Type>
+class MFBase {
   using TMatrix = std::vector<std::vector<Type>>;
 
 public:

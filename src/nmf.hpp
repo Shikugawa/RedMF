@@ -11,7 +11,7 @@
 
 namespace MF {
   template<typename Type>
-  class MatrixFactorization : public MFBase<Type> {
+  class NMF : public MFBase<Type> {
     using TMatrix = std::vector<std::vector<Type>>;
     using MFBase<Type>::matrix;
     using MFBase<Type>::P;
@@ -22,7 +22,7 @@ namespace MF {
     using MFBase<Type>::matrixRRowNum;
 
   public:
-    MatrixFactorization(std::unique_ptr<Matrix<Type>> m, double const thd, int const d) {
+    NMF(std::unique_ptr<Matrix<Type>> m, double const thd, int const d) {
       matrix = std::move(m);
       thereshold = thd;
       dim = d;
@@ -30,26 +30,6 @@ namespace MF {
       matrixRColNum = matrix->colNum;
       P = std::make_unique<Matrix<Type>>(matrixRRowNum, dim);
       Q = std::make_unique<Matrix<Type>>(matrixRColNum, dim);
-    }
-
-    void execute(bool const verbose = false) {
-      #pragma omp parallel for
-      for(size_t u = 0; u < matrixRRowNum; u++) {
-        if (verbose) {
-          std::cout << "Optimising user " << u << std::endl; // 並列化したら表示がバグる
-        }
-        #pragma omp parallel for
-        for(size_t i = 0; i < matrixRColNum; i++) {
-          while(true) {
-            std::vector<Type> p = P->getMatrixRow(u);
-            std::vector<Type> q = Q->getMatrixRow(i);
-            Type expectedr = mul<Type>(p, q);
-            Type error = expectedr - matrix->getMatrixElem(u, i);
-            if(std::pow(error, 2) < thereshold) break;
-            update(0.001, error, u, i, p, q);
-          }
-        }
-      }
     }
 
     void execute(int const iteration, bool const verbose = false) {
@@ -64,7 +44,7 @@ namespace MF {
             Type expectedr = mul<Type>(p, q);
             Type error = expectedr - matrix->getMatrixElem(u, i);
             rmse += std::pow(error, 2);
-            update(0.001, error, u, i, p, q);
+            update(expected, u, i, p, q);
           }
         }
 
@@ -77,15 +57,27 @@ namespace MF {
       }
     }
 
-    void update(double const alpha, Type const error, 
-                int const u, int const i, 
+    void update(double const expected, 
+                int const _u, int const _i, 
                 std::vector<Type> p, std::vector<Type> q) {
-      for(size_t j = 0; j < dim; ++j) {
-        auto& tmp = p[j];
-        p[j] -= 2*alpha*error*q[j];
-        q[j] -= 2*alpha*error*tmp;
-        P->changeElem(u, j, p[j]);
-        Q->changeElem(i, j, q[j]);
+      for(size_t k = 0; k < dim; ++k) {
+        double sum1 = 0;
+        double sum2 = 0;
+        double sum3 = 0;
+        double sum4 = 0;
+
+        for(size_t i = 0; i < matrix->colNum; ++i) {
+          sum1 += matrix->getMatrixElem(_u, i) * Q->getMatrixElem(k, i);
+          sum2 += expected * Q->getMatrixElem(k, i);
+        }
+        
+        for(size_t u = 0; u < matrix->rowNum; ++u) {
+          sum3 += matrix->getMatrixElem(u, _i) * Q->getMatrixElem(u, k);
+          sum4 += expected * Q->getMatrixElem(u, k);
+        }
+
+        P->changeElem(_u, k, p[k]*(sum1/sum2));
+        Q->changeElem(k, _i, q[k]*(sum3/sum4));
       }
     }
   };

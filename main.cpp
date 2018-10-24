@@ -46,7 +46,7 @@ int main(int argc, char const *argv[]) {
   }
 
   
-  std::unique_ptr<MatrixFactorization<double>> mf = std::make_unique<MatrixFactorization<double>>(
+  std::unique_ptr<MF::MatrixFactorization<double>> mf = std::make_unique<MF::MatrixFactorization<double>>(
     std::make_unique<Matrix<double>>(d), 0.001, 20
   );
  
