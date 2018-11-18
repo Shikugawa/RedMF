@@ -1,4 +1,5 @@
 #include "lib/matrix.hpp"
+#include "lib/vec.hpp"
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -39,6 +40,7 @@ int main(void){
     {5, 6}
   };
 
+  std::cout << vtr[0] * vtr[1] << std::endl;
   std::unique_ptr<Matrix<double>> pm = std::make_unique<Matrix<double>>(vtr);
   std::unique_ptr<Matrix<double>> pm2 = std::make_unique<Matrix<double>>(vtr2);
 

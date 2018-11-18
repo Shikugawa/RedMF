@@ -29,6 +29,7 @@ public:
     return new Matrix(result);
   }
 
+  
   inline TMatrix getMatrix() {
     return eigenMatrixToSTLVector();
   };
