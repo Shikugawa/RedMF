@@ -1,3 +1,4 @@
+#pragma once
 #include <eigen3/Eigen/Core>
 #include <vector>
 #include <memory>
@@ -61,9 +62,9 @@ public:
     for(size_t i = 0; i < colNum; i++) {
       std::vector<T> v;
       for(size_t j = 0; j < rowNum; j++) {
-        v.push_back(matrix->coeff(j, i));
+        v.emplace_back(matrix->coeff(j, i));
       }
-      pTransposed.push_back(v);
+      pTransposed.emplace_back(v);
     }
     return pTransposed;
   };
@@ -73,9 +74,9 @@ public:
     for(size_t i = 0; i < m.rows(); ++i) {
       std::vector<T> v;
       for(size_t j = 0; j < m.cols(); ++j) {
-        v.push_back(m.coeff(i, j));
+        v.emplace_back(m.coeff(i, j));
       }
-      result.push_back(v);
+      result.emplace_back(v);
     }
     return result;
   }
@@ -84,9 +85,9 @@ private:
   TMatrix getFilledMatrix(int num) {
     TMatrix filled;
     for(size_t i = 0; i < rowNum; ++i) {
-      filled.push_back({});     
+      filled.emplace_back({});     
       for(size_t j = 0; j < colNum; ++j)
-        filled[i].push_back(0);
+        filled[i].emplace_back(0);
     }
 
     return filled;
@@ -97,9 +98,9 @@ private:
     for(size_t i = 0; i < this->rowNum; ++i) {
       std::vector<T> v;
       for(size_t j = 0; j < this->colNum; ++j) {
-        v.push_back(matrix.get()->coeff(i, j));
+        v.emplace_back(matrix.get()->coeff(i, j));
       }
-      result.push_back(v);
+      result.emplace_back(v);
     }
     return result;
   }
@@ -107,7 +108,7 @@ private:
   std::vector<T> eigenVectorToSTLVector(Eigen::VectorXd vector) {
     std::vector<T> result;
     for(size_t i = 0; i < vector.size(); i++) {
-      result.push_back(vector.coeff(i));
+      result.emplace_back(vector.coeff(i));
     }
     return result;
   }

@@ -1,3 +1,4 @@
+#pragma once
 #include <cmath>
 #include <iostream>
 #include "mfbase.hpp"
@@ -39,7 +40,7 @@ namespace MF {
           for(size_t i = 0; i < matrixRColNum; ++i) {
             std::vector<Type> p = P->getMatrixRow(u);
             std::vector<Type> q = Q->getMatrixRow(i);
-            Type expectedr = mul<Type>(p, q);
+            Type expectedr = p*q;
             Type error = expectedr - matrix->getMatrixElem(u, i);
             rmse += std::pow(error, 2);
             update(expected, u, i, p, q);

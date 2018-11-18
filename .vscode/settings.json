@@ -19,6 +19,8 @@
     "iosfwd": "cpp",
     "memory": "cpp",
     "ostream": "cpp",
-    "iostream": "cpp"
+    "iostream": "cpp",
+    "istream": "cpp",
+    "functional": "cpp"
   }
 }

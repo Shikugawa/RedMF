@@ -5,7 +5,8 @@
 #include <sstream>
 #include <utility>
 #include <iterator>
-#include "src/mf.hpp"
+#include "src/kmf.hpp"
+#include "lib/kernel.hpp"
 
 using TMatrix = std::vector<std::vector<double>>;
 
@@ -15,7 +16,7 @@ std::vector<double> split(std::string const &s, char delimiter) {
   std::string item;
   while(std::getline(ss, item, delimiter)) {
     if(!item.empty()) {
-      result.push_back(std::stod(item));
+      result.emplace_back(std::stod(item));
     }
   }
   return result;
@@ -41,19 +42,18 @@ int main(int argc, char const *argv[]) {
     std::string line;
     
     while(std::getline(fs, line)) {
-      d.push_back(split(line, ','));
+      d.emplace_back(split(line, ','));
     }
   }
 
-  
-  std::unique_ptr<MF::MatrixFactorization<double>> mf = std::make_unique<MF::MatrixFactorization<double>>(
+  std::unique_ptr<MF::KernelizedMF<double>> kmf = std::make_unique<MF::KernelizedMF<double>>(
     std::make_unique<Matrix<double>>(d), 0.001, 10
   );
- 
-  mf->execute(20, true);
 
-  TMatrix P = mf->getPMatrix();
-  TMatrix Q = mf->getQMatrix();
+  kmf->execute(KernelFunctions<double>::gaussianKernel, 20, true);
+
+  TMatrix P = kmf->getPMatrix();
+  TMatrix Q = kmf->getQMatrix();
 
   outputCSV("P.csv", P);
   outputCSV("Q.csv", Q);

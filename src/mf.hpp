@@ -1,5 +1,4 @@
- // Reference: http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
-
+#pragma once
 #include <cmath>
 #include <iostream>
 #include "mfbase.hpp"
@@ -43,7 +42,7 @@ namespace MF {
           while(true) {
             std::vector<Type> p = P->getMatrixRow(u);
             std::vector<Type> q = Q->getMatrixRow(i);
-            Type expectedr = mul<Type>(p, q);
+            Type expectedr = p*q;
             Type error = expectedr - matrix->getMatrixElem(u, i);
             if(std::pow(error, 2) < thereshold) break;
             update(0.001, error, u, i, p, q);
@@ -64,7 +63,7 @@ namespace MF {
             
             std::vector<Type> p = P->getMatrixRow(u);
             std::vector<Type> q = Q->getMatrixRow(i);
-            Type expectedr = mul<Type>(p, q);
+            Type expectedr = p*q;
             Type error = expectedr - matrix->getMatrixElem(u, i);
             rmse += std::pow(error, 2);
             update(0.0002, error, u, i, p, q);
