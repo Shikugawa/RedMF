@@ -1,5 +1,3 @@
- // Reference: http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a-simple-tutorial-and-implementation-in-python/
-
 #include <cmath>
 #include <iostream>
 #include "mfbase.hpp"

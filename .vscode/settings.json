@@ -18,6 +18,7 @@
     "cstdint": "cpp",
     "iosfwd": "cpp",
     "memory": "cpp",
-    "ostream": "cpp"
+    "ostream": "cpp",
+    "iostream": "cpp"
   }
 }

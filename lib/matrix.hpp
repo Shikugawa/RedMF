@@ -16,15 +16,21 @@ public:
     tMatrixToEigenMatrix(R);
   }
 
-  // Random Matrix when initialzation
   Matrix(int rowSize, int colSize) {
     rowNum = rowSize;
     colNum = colSize;
     matrix = std::make_unique<Eigen::MatrixXd>(Eigen::MatrixXd::Random(rowNum, colNum));
   }
 
+  Matrix* operator*(Matrix& m) {
+    auto matrixLeft = *(this->matrix);
+    auto matrixRight = *(m.matrix);
+    auto result = eigenMatrixToSTLVector(matrixLeft * matrixRight);
+    return new Matrix(result);
+  }
+
   inline TMatrix getMatrix() {
-    return eigenMatrixToSTLVector(colNum, rowNum);
+    return eigenMatrixToSTLVector();
   };
 
   inline T getMatrixElem(int x, int y) const {
@@ -39,12 +45,14 @@ public:
 
   std::vector<T> getMatrixRow(int x) {
     if(x >= rowNum) throw "invalid argument";
-    return eigenVectorToSTLVector((Eigen::VectorXd)matrix->row(x), colNum);
+    auto passingVector = static_cast<Eigen::VectorXd>(matrix->row(x));
+    return eigenVectorToSTLVector(passingVector);
   }
 
   std::vector<T> getMatrixCol(int y) {
     if(y >= colNum) throw "invalid argument";
-    return eigenVectorToSTLVector((Eigen::VectorXd)matrix->col(y), rowNum);
+    auto passingVector = static_cast<Eigen::VectorXd>(matrix->row(y));
+    return eigenVectorToSTLVector(passingVector);
   };
 
   TMatrix getTranspose() {
@@ -58,7 +66,19 @@ public:
     }
     return pTransposed;
   };
-  
+
+  static TMatrix eigenMatrixToSTLVector(Eigen::MatrixXd m) {
+    TMatrix result;
+    for(size_t i = 0; i < m.rows(); ++i) {
+      std::vector<T> v;
+      for(size_t j = 0; j < m.cols(); ++j) {
+        v.push_back(m.coeff(i, j));
+      }
+      result.push_back(v);
+    }
+    return result;
+  }
+
 private:
   TMatrix getFilledMatrix(int num) {
     TMatrix filled;
@@ -71,11 +91,11 @@ private:
     return filled;
   };
 
-  TMatrix eigenMatrixToSTLVector(int col, int row) {
+  TMatrix eigenMatrixToSTLVector() {
     TMatrix result;
-    for(size_t i = 0; i < row; i++) {
+    for(size_t i = 0; i < this->rowNum; ++i) {
       std::vector<T> v;
-      for(size_t j = 0; j < col; j++) {
+      for(size_t j = 0; j < this->colNum; ++j) {
         v.push_back(matrix.get()->coeff(i, j));
       }
       result.push_back(v);
@@ -83,12 +103,11 @@ private:
     return result;
   }
 
-  std::vector<T> eigenVectorToSTLVector(Eigen::VectorXd vector, int size) {
+  std::vector<T> eigenVectorToSTLVector(Eigen::VectorXd vector) {
     std::vector<T> result;
-    for(size_t i = 0; i < size; i++) {
+    for(size_t i = 0; i < vector.size(); i++) {
       result.push_back(vector.coeff(i));
     }
-
     return result;
   }
 

@@ -20,15 +20,31 @@ template<typename T> void printVector(const std::vector<T> v){
 }
 
 int main(void){
-  TMatrix vtr = {
-    {1.0, 4.2, 0.0, 1.9, 2.3},
-    {2.3, 5.6, 6.3, 0.0, 0.0},
-    {0.0, 0.0, 2.5, 2.3, 0.0},
-    {5.2, 1.3, 2.5, 0.0, 2.4},
-    {0.0, 0.0, 0.0, 2.3, 2.6}
-  };
+  // TMatrix vtr = {
+  //   {1.0, 4.2, 0.0, 1.9, 2.3},
+  //   {2.3, 5.6, 6.3, 0.0, 0.0},
+  //   {0.0, 0.0, 2.5, 2.3, 0.0},
+  //   {5.2, 1.3, 2.5, 0.0, 2.4},
+  //   {0.0, 0.0, 0.0, 2.3, 2.6}
+  // };
   
+  TMatrix vtr = {
+    {100, 2, 8},
+    {3, 4, 5}
+  };
+
+  TMatrix vtr2 = {
+    {1, 2},
+    {3, 4},
+    {5, 6}
+  };
+
   std::unique_ptr<Matrix<double>> pm = std::make_unique<Matrix<double>>(vtr);
+  std::unique_ptr<Matrix<double>> pm2 = std::make_unique<Matrix<double>>(vtr2);
+
+  std::cout << "expect 146, 256, 40, 52" << std::endl;
+  auto result = (*pm) * (*pm2);
+  printMatrix(result->getMatrix());
   std::cout << "expect 3" << std::endl;
   std::cout << pm->colNum << std::endl;
   std::cout << "expect 2" << std::endl;
