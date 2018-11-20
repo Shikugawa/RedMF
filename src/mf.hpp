@@ -58,15 +58,12 @@ namespace MF {
         for(size_t u = 0; u < matrixRRowNum; ++u) {
           #pragma omp parallel for
           for(size_t i = 0; i < matrixRColNum; ++i) {
-            if (matrix->getMatrixElem(u, i) == 0)
-              continue;
-            
             std::vector<Type> p = P->getMatrixRow(u);
             std::vector<Type> q = Q->getMatrixRow(i);
             Type expectedr = p*q;
-            Type error = expectedr - matrix->getMatrixElem(u, i);
-            rmse += std::pow(error, 2);
-            update(0.0002, error, u, i, p, q);
+            Type error = std::pow(expectedr - matrix->getMatrixElem(u, i), 2);
+            rmse += error;
+            update(0.0002, std::sqrt(error), u, i, p, q);
           }
         }
 
@@ -84,8 +81,8 @@ namespace MF {
                 std::vector<Type> p, std::vector<Type> q) {
       for(size_t j = 0; j < dim; ++j) {
         auto& tmp = p[j];
-        p[j] -= 2*alpha*error*q[j];
-        q[j] -= 2*alpha*error*tmp;
+        p[j] += 2*alpha*error*q[j];
+        q[j] += 2*alpha*error*tmp;
         P->changeElem(u, j, p[j]);
         Q->changeElem(i, j, q[j]);
       }

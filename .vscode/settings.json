@@ -21,6 +21,7 @@
     "ostream": "cpp",
     "iostream": "cpp",
     "istream": "cpp",
-    "functional": "cpp"
+    "functional": "cpp",
+    "__string": "cpp"
   }
 }

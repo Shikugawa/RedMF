@@ -4,7 +4,6 @@
 #include <functional>
 #include "mfbase.hpp"
 #include "../lib/vec.hpp"
-
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -45,7 +44,7 @@ namespace MF {
             std::vector<Type> p = P->getMatrixRow(u);
             std::vector<Type> q = Q->getMatrixRow(i);
             Type expectedr = kernelFunction(p, q);
-            Type error = expectedr - matrix->getMatrixElem(u, i);
+            Type error = expectedr - matrix->getMatrixElem(u, i); 
             if(std::pow(error, 2) < thereshold) break;
             update(0.001, error, u, i, p, q);
           }
@@ -60,16 +59,16 @@ namespace MF {
         for(size_t u = 0; u < matrixRRowNum; ++u) {
           #pragma omp parallel for
           for(size_t i = 0; i < matrixRColNum; ++i) {
-            if (matrix->getMatrixElem(u, i) == 0)
-              continue;
             std::vector<Type> p = P->getMatrixRow(u);
             std::vector<Type> q = Q->getMatrixRow(i);
             Type expectedr = kernelFunction(p, q);
-            Type error = expectedr - matrix->getMatrixElem(u, i);
-            rmse += std::pow(error, 2);
-            update(0.0002, error, u, i, p, q);
+            Type error = std::pow(expectedr - matrix->getMatrixElem(u, i), 2);
+            rmse += error;
+            update(0.0002, std::sqrt(error), u, i, p, q);
           }
         }
+
+        // カーネル重み更新
 
         rmse = std::sqrt(rmse / (matrix->colNum * matrix->rowNum));
         if (verbose) {
@@ -80,13 +79,13 @@ namespace MF {
       }
     }
 
-    void update(double const alpha, Type const error, 
-                int const u, int const i, 
+    void update(double const alpha, Type const error,
+                int const u, int const i,
                 std::vector<Type> p, std::vector<Type> q) {
       for(size_t j = 0; j < dim; ++j) {
         auto& tmp = p[j];
-        p[j] -= 2*alpha*error*q[j];
-        q[j] -= 2*alpha*error*tmp;
+        p[j] += 2*alpha*error*q[j];
+        q[j] += 2*alpha*error*tmp;
         P->changeElem(u, j, p[j]);
         Q->changeElem(i, j, q[j]);
       }

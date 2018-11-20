@@ -6,9 +6,12 @@
 template <typename T>
 class KernelFunctions {
 public:
-  static T gaussianKernel(std::vector<T> a, std::vector<T> b) {
-    double sigma = 30;
+  static T gaussianKernel(std::vector<T> a, std::vector<T> b, double const sigma = 0.1) {
     T squaredNorm = pow(norm(a-b), 2);
-    return -exp(squaredNorm / pow(sigma, 2));
+    return std::exp(-(squaredNorm / std::pow(sigma, 2)));
+  }
+
+  static T linear() {
+
   }
 };

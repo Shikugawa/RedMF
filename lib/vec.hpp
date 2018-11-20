@@ -32,6 +32,15 @@ T operator*(const std::vector<T>& a, const std::vector<T>& b) {
 }
 
 template <typename T>
+std::vector<T> operator*(const T a, const std::vector<T>& b) {
+  std::vector<T> result;
+  for(size_t i = 0; i < b.size(); i++) {
+    result.emplace_back(a*b[i]);
+  }
+  return result;
+}
+
+template <typename T>
 std::vector<T> operator-(const std::vector<T>& a, const std::vector<T>& b) {
   std::vector<T> result;
   if(!checkVector(a, b)){
