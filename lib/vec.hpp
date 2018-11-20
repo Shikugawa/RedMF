@@ -34,8 +34,17 @@ T operator*(const std::vector<T>& a, const std::vector<T>& b) {
 template <typename T>
 std::vector<T> operator*(const T a, const std::vector<T>& b) {
   std::vector<T> result;
-  for(size_t i = 0; i < b.size(); i++) {
+  for(size_t i = 0; i < b.size(); ++i) {
     result.emplace_back(a*b[i]);
+  }
+  return result;
+}
+
+template <typename T>
+std::vector<T> operator+(const std::vector<T>& a, const std::vector<T>& b) {
+  std::vector<T> result;
+  for(size_t i = 0; i < a.size(); ++i) {
+    result.emplace_back(a[i]+b[i]);
   }
   return result;
 }
@@ -46,7 +55,7 @@ std::vector<T> operator-(const std::vector<T>& a, const std::vector<T>& b) {
   if(!checkVector(a, b)){
     throw "operands must be same length";
   }
-  for(size_t i = 0; i < a.size(); i++) {
+  for(size_t i = 0; i < a.size(); ++i) {
     result.emplace_back(a[i]-b[i]);
   }
   return result;
