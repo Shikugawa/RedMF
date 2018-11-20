@@ -1,5 +1,8 @@
 ### https://raw.github.com/github/gitignore/9139ad597b05354da689b19ce805c389252a6b8b/C.gitignore
 
+/.vscode
+/.idea
+
 # Prerequisites
 *.d
 
