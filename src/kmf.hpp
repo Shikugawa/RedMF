@@ -40,6 +40,9 @@ namespace MF {
         }
         #pragma omp parallel for
         for(size_t i = 0; i < matrixRColNum; i++) {
+          if(matrix->getMatrixElem(u, i) == 0)
+              continue;
+          
           while(true) {
             std::vector<Type> p = P->getMatrixRow(u);
             std::vector<Type> q = Q->getMatrixRow(i);
@@ -52,13 +55,16 @@ namespace MF {
       }
     }
 
-    void execute(kFType kernelFunction, int const iteration, bool const verbose = false) {
+    void execute(kFType kernelFunction, int const iteration, const bool verbose = false, const bool normalize = true) {
       for(size_t itr = 0; itr < iteration; ++itr) {
         double rmse = 0;
         #pragma omp parallel for
         for(size_t u = 0; u < matrixRRowNum; ++u) {
           #pragma omp parallel for
           for(size_t i = 0; i < matrixRColNum; ++i) {
+            if(matrix->getMatrixElem(u, i) == 0)
+              continue;
+            
             std::vector<Type> p = P->getMatrixRow(u);
             std::vector<Type> q = Q->getMatrixRow(i);
             Type expectedr = kernelFunction(p, q);

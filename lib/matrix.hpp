@@ -20,7 +20,7 @@ public:
   Matrix(int rowSize, int colSize) {
     rowNum = rowSize;
     colNum = colSize;
-    matrix = std::make_unique<Eigen::MatrixXd>(Eigen::MatrixXd::Random(rowNum, colNum));
+    matrix = std::make_unique<Eigen::MatrixXd>(Eigen::MatrixXd::Random(rowNum, colNum).cwiseAbs());
   }
 
   Matrix* operator*(Matrix& m) {
@@ -30,7 +30,6 @@ public:
     return new Matrix(result);
   }
 
-  
   inline TMatrix getMatrix() {
     return eigenMatrixToSTLVector();
   };
@@ -53,7 +52,7 @@ public:
 
   std::vector<T> getMatrixCol(int y) {
     if(y >= colNum) throw "invalid argument";
-    auto passingVector = static_cast<Eigen::VectorXd>(matrix->row(y));
+    auto passingVector = static_cast<Eigen::VectorXd>(matrix->col(y));
     return eigenVectorToSTLVector(passingVector);
   };
 

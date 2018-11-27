@@ -1,5 +1,7 @@
 #pragma once
 #include "../lib/matrix.hpp"
+#include "../lib/vec.hpp"
+#include <cmath>
 #include <vector>
 #include <memory>
 #include <functional>
@@ -22,14 +24,6 @@ public:
     return Q->getMatrix();
   }
 
-  // virtual void execute (bool const verbose = false) = 0;
-  // virtual void execute (int const iteration, bool const berbose = false) = 0;
-  // virtual void execute (kFType kernelFunction, int const iteration, bool const berbose = false) = 0;
-
-  virtual void update(double const alpha, Type const error, 
-              int const u, int const i, 
-              std::vector<Type> p, std::vector<Type> q) = 0;
-
   TMatrix getFilledMatrix(Type const value, int const rowNum, int const colNum) {
     TMatrix filled;
     for(size_t i = 0; i < rowNum; ++i) {
@@ -40,4 +34,16 @@ public:
 
     return filled;
   };
+
+  virtual Type RMSE(size_t matrix_col, size_t matrix_row, Matrix<Type>& iuMatrix, Matrix<Type>& P, Matrix<Type>& Q) {
+    double result = 0;
+    for(size_t u = 0; u < matrix_row; u++) {
+      for(size_t i = 0; i < matrix_col; i++) {
+        std::vector<Type> pu = P.getMatrixRow(u);
+        std::vector<Type> qi = Q.getMatrixRow(i);
+        result += std::pow(iuMatrix.getMatrixElem(u, i)-pu*qi, 2);
+      }
+    }
+    return std::sqrt(result/(matrix_col*matrix_row));
+  }
 };

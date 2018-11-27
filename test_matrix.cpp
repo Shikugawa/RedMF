@@ -44,23 +44,33 @@ int main(void){
   std::unique_ptr<Matrix<double>> pm = std::make_unique<Matrix<double>>(vtr);
   std::unique_ptr<Matrix<double>> pm2 = std::make_unique<Matrix<double>>(vtr2);
 
-  std::cout << "expect 146, 256, 40, 52" << std::endl;
-  auto result = (*pm) * (*pm2);
-  printMatrix(result->getMatrix());
-  std::cout << "expect 3" << std::endl;
-  std::cout << pm->colNum << std::endl;
-  std::cout << "expect 2" << std::endl;
-  std::cout << pm->rowNum << std::endl;
-  std::cout << "expected 2" << std::endl;
-  std::cout << pm->getMatrixElem(0, 1) << std::endl;
-  pm->changeElem(0, 0, 100);
-  std::cout << "expected 100, 2, 8, 3, 4, 5" << std::endl;
-  printMatrix(pm->getMatrix());
-  std::cout << "expected 3, 4, 5" << std::endl;
-  printVector<double>(pm->getMatrixRow(1));
-  std::cout << "expected 2, 4" << std::endl;
-  printVector<double>(pm->getMatrixCol(1));
-  std::cout << "expected 100, 3, 2, 4, 8, 5" << std::endl;
-  printMatrix(pm->getTranspose());
-}
+  // auto a = pm->getMatrixRow(0);
+  // auto b = pm2->getMatrixCol(0);
+  // std::cout << a*b << std::endl;
 
+  // for(auto _a: b) {
+  //   std::cout << _a << " " << std::endl;
+  // }
+  // std::cout << pm->getMatrixRow(1) * pm->getMatrixCol(0) << std::endl;
+  // std::cout << "expect 146, 256, 40, 52" << std::endl;
+  // auto result = (*pm) * (*pm2);
+  // printMatrix(result->getMatrix());
+  // std::cout << "expect 3" << std::endl;
+  // std::cout << pm->colNum << std::endl;
+  // std::cout << "expect 2" << std::endl;
+  // std::cout << pm->rowNum << std::endl;
+  // std::cout << "expected 2" << std::endl;
+  std::cout << pm->getMatrixElem(0, 2) << std::endl;
+  // pm->changeElem(0, 0, 100);
+  // std::cout << "expected 100, 2, 8, 3, 4, 5" << std::endl;
+  // printMatrix(pm->getMatrix());
+  
+  // std::cout << "expected 3, 4, 5" << std::endl;
+  // printVector<double>(pm->getMatrixRow(1));
+  
+  // std::cout << "expected 2, 4" << std::endl;
+  // printVector<double>(pm->getMatrixCol(1));
+
+  // std::cout << "expected 100, 3, 2, 4, 8, 5" << std::endl;
+  // printMatrix(pm->getTranspose());
+}

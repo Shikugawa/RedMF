@@ -35,10 +35,13 @@ namespace MF {
       #pragma omp parallel for
       for(size_t u = 0; u < matrixRRowNum; u++) {
         if (verbose) {
-          std::cout << "Optimising user " << u << std::endl; // 並列化したら表示がバグる
+          std::cout << "Optimising user " << u << std::endl;
         }
         #pragma omp parallel for
         for(size_t i = 0; i < matrixRColNum; i++) {
+          if(matrix->getMatrixElem(u, i) == 0)
+              continue;
+
           while(true) {
             std::vector<Type> p = P->getMatrixRow(u);
             std::vector<Type> q = Q->getMatrixRow(i);
@@ -53,38 +56,63 @@ namespace MF {
 
     void execute(int const iteration, bool const verbose = false) {
       for(size_t itr = 0; itr < iteration; ++itr) {
-        double rmse = 0;
+        std::cout << "=====================================================" << std::endl;
+        std::cout << "Iteration: " << itr + 1 << std::endl;
+        double sum_error = 0;
+        std::uint32_t rated = 0;
+
         #pragma omp parallel for
         for(size_t u = 0; u < matrixRRowNum; ++u) {
           #pragma omp parallel for
           for(size_t i = 0; i < matrixRColNum; ++i) {
             std::vector<Type> p = P->getMatrixRow(u);
             std::vector<Type> q = Q->getMatrixRow(i);
-            Type expectedr = p*q;
-            Type error = std::pow(expectedr - matrix->getMatrixElem(u, i), 2);
-            rmse += error;
-            update(0.0002, std::sqrt(error), u, i, p, q);
+            Type real_value = matrix->getMatrixElem(u, i);
+
+            if(real_value != 0){
+              Type error_squared = std::pow(p*q-real_value, 2);
+              Type error = std::sqrt(error_squared);
+              if(error == NAN || error == INFINITY) {
+                exit(EXIT_FAILURE);
+              }
+              if (error > 10){
+                for(auto _p: p){
+                  std::cout << _p << " ";
+                }
+                std::cout << "\n";
+                for(auto _p: q){
+                  std::cout << _p << " ";
+                }
+                std::cout << "\n";
+                std::cout << p*q << " " << real_value << " " << error << std::endl;
+              }
+                
+              sum_error += error_squared;
+              update(0.0002, error, u, i);
+              rated++;
+            }
           }
         }
-
-        rmse = std::sqrt(rmse / (matrix->colNum * matrix->rowNum));
-        if (verbose) {
-          std::cout << "=====================================================" << std::endl;
-          std::cout << "Iteration: " << itr + 1 << std::endl;
-          std::cout << "RMSE: " << rmse << std::endl;
-        }
+        std::cout << sum_error << " " << rated << std::endl;
+        std::cout << "RMSE: " << std::sqrt(sum_error/rated) << std::endl;
+        std::cout << "=====================================================" << std::endl;
       }
     }
 
     void update(double const alpha, Type const error, 
-                int const u, int const i, 
-                std::vector<Type> p, std::vector<Type> q) {
+                int const u, int const i) {
       for(size_t j = 0; j < dim; ++j) {
-        auto& tmp = p[j];
-        p[j] += 2*alpha*error*q[j];
-        q[j] += 2*alpha*error*tmp;
-        P->changeElem(u, j, p[j]);
-        Q->changeElem(i, j, q[j]);
+        // auto tmp = p[j];
+        // std::cout << p[j] << std::endl;
+        // if(p[j]+alpha*(2*error*q[j]-0.02*p[j]) > 10){
+        //   // std::cout << p[j] << " " << q[j] << std::endl;
+        //   std::cout << p[j]+alpha*(2*error*q[j]-0.02*p[j]) << std::endl;
+        // }
+        auto _p = P->getMatrixElem(u, j);
+        auto _q = Q->getMatrixElem(i, j);
+        // std::cout << _p+alpha*(2*error*_q-0.02*_p) << std::endl;
+        P->changeElem(u, j, _p+alpha*(2*error*_q-0.02*_p));
+        Q->changeElem(i, j, _q+alpha*(2*error*_p-0.02*_q));
       }
     }
   };

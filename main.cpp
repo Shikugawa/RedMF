@@ -5,8 +5,8 @@
 #include <sstream>
 #include <utility>
 #include <iterator>
-// #include "src/mf.hpp"
-#include "src/kmf.hpp"
+#include "src/mf.hpp"
+// #include "src/kmf.hpp"
 #include "lib/kernel.hpp"
 
 using TMatrix = std::vector<std::vector<double>>;
@@ -37,6 +37,13 @@ void outputCSV(std::string const fileName, TMatrix& m) {
 
 int main(int argc, char const *argv[]) {
   TMatrix d;
+  // TMatrix d = {
+  //   {1.0, 4.2, 0.0, 1.9, 2.3},
+  //   {2.3, 5.6, 6.3, 0.0, 0.0},
+  //   {0.0, 0.0, 2.5, 2.3, 0.0},
+  //   {5.2, 1.3, 2.5, 0.0, 2.4},
+  //   {0.0, 0.0, 0.0, 2.3, 2.6}
+  // };
 
   {
     std::ifstream fs("./dataset/matrix.csv");
@@ -47,11 +54,11 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  std::unique_ptr<MF::KernelizedMF<double>> kmf = std::make_unique<MF::KernelizedMF<double>>(
+  std::unique_ptr<MF::MatrixFactorization<double>> kmf = std::make_unique<MF::MatrixFactorization<double>>(
     std::make_unique<Matrix<double>>(d), 0.001, 10
   );
 
-  kmf->execute(KernelFunctions<double>::gaussianKernel, 20, true);
+  kmf->execute(100, true);
 
   TMatrix P = kmf->getPMatrix();
   TMatrix Q = kmf->getQMatrix();
