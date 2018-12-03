@@ -15,7 +15,7 @@ namespace MF {
     using MFBase<Type>::matrix;
     using MFBase<Type>::P;
     using MFBase<Type>::Q;
-    using MFBase<Type>::dim;
+    using MFBase<Type>::k;
     using MFBase<Type>::thereshold;
     using MFBase<Type>::matrixRColNum;
     using MFBase<Type>::matrixRRowNum;
@@ -24,11 +24,11 @@ namespace MF {
     NMF(std::unique_ptr<Matrix<Type>> m, double const thd, int const d) {
       matrix = std::move(m);
       thereshold = thd;
-      dim = d;
+      k = d;
       matrixRRowNum = matrix->rowNum;
       matrixRColNum = matrix->colNum;
-      P = std::make_unique<Matrix<Type>>(matrixRRowNum, dim);
-      Q = std::make_unique<Matrix<Type>>(matrixRColNum, dim);
+      P = std::make_unique<Matrix<Type>>(matrixRRowNum, k);
+      Q = std::make_unique<Matrix<Type>>(matrixRColNum, k);
     }
 
     void execute(int const iteration, bool const verbose = false) {
@@ -59,7 +59,7 @@ namespace MF {
     void update(double const expected, 
                 int const _u, int const _i, 
                 std::vector<Type> p, std::vector<Type> q) {
-      for(size_t k = 0; k < dim; ++k) {
+      for(size_t k = 0; k < k; ++k) {
         double sum1 = 0;
         double sum2 = 0;
         double sum3 = 0;

@@ -14,7 +14,7 @@ class MFBase {
 public:
   std::unique_ptr<Matrix<Type>> matrix, P, Q;
   double thereshold;
-  int dim, matrixRRowNum, matrixRColNum;
+  int k, matrixRRowNum, matrixRColNum;
   
   TMatrix getPMatrix() {
     return P->getMatrix();

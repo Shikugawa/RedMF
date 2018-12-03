@@ -15,7 +15,7 @@ namespace MF {
     using MFBase<Type>::matrix;
     using MFBase<Type>::P;
     using MFBase<Type>::Q;
-    using MFBase<Type>::dim;
+    using MFBase<Type>::k;
     using MFBase<Type>::thereshold;
     using MFBase<Type>::matrixRColNum;
     using MFBase<Type>::matrixRRowNum;
@@ -24,11 +24,11 @@ namespace MF {
     MatrixFactorization(std::unique_ptr<Matrix<Type>> m, double const thd, int const d) {
       matrix = std::move(m);
       thereshold = thd;
-      dim = d;
+      k = d;
       matrixRRowNum = matrix->rowNum;
       matrixRColNum = matrix->colNum;
-      P = std::make_unique<Matrix<Type>>(matrixRRowNum, dim);
-      Q = std::make_unique<Matrix<Type>>(matrixRColNum, dim);
+      P = std::make_unique<Matrix<Type>>(matrixRRowNum, k);
+      Q = std::make_unique<Matrix<Type>>(matrixRColNum, k);
     }
 
     std::vector<Type> execute(int const iteration, double thereshold = 0.5) {
@@ -65,7 +65,7 @@ namespace MF {
 
     void update(const double alpha, Type error, 
                 const int u, const int i, const double lambda = 0.02) {
-      for(size_t j = 0; j < dim; ++j) {
+      for(size_t j = 0; j < k; ++j) {
         P->changeElem(
           u, j, 
           P->getMatrixElem(u, j)+alpha*(2*error*Q->getMatrixElem(i, j)-lambda*P->getMatrixElem(u, j))

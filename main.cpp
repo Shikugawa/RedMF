@@ -5,8 +5,8 @@
 #include <sstream>
 #include <utility>
 #include <iterator>
-#include "src/mf.hpp"
-// #include "src/kmf.hpp"
+// #include "src/mf.hpp"
+#include "src/kmf.hpp"
 #include "lib/kernel.hpp"
 
 using TMatrix = std::vector<std::vector<double>>;
@@ -54,11 +54,11 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  std::unique_ptr<MF::MatrixFactorization<double>> kmf = std::make_unique<MF::MatrixFactorization<double>>(
-    std::make_unique<Matrix<double>>(d), 0.001, 10
+  std::unique_ptr<MF::KernelizedMF<double>> kmf = std::make_unique<MF::KernelizedMF<double>>(
+    std::make_unique<Matrix<double>>(d), 5, 5, 0.001, 0.0002, KernelFunctions<double>::gaussianKernel
   );
 
-  kmf->execute(100, true);
+  kmf->execute(10);
 
   TMatrix P = kmf->getPMatrix();
   TMatrix Q = kmf->getQMatrix();
