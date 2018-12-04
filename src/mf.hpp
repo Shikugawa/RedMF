@@ -21,9 +21,8 @@ namespace MF {
     using MFBase<Type>::matrixRRowNum;
 
   public:
-    MatrixFactorization(std::unique_ptr<Matrix<Type>> m, double const thd, int const d) {
+    MatrixFactorization(std::unique_ptr<Matrix<Type>> m, int const d) {
       matrix = std::move(m);
-      thereshold = thd;
       k = d;
       matrixRRowNum = matrix->rowNum;
       matrixRColNum = matrix->colNum;
@@ -36,6 +35,7 @@ namespace MF {
       for(size_t itr = 0; itr < iteration; ++itr) {
         std::cout << "=====================================================" << std::endl;
         std::cout << "Iteration: " << itr + 1 << std::endl;
+        
         double sum_error = 0;
         std::uint32_t rated = 0;
 

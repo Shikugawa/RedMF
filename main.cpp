@@ -54,14 +54,18 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  std::unique_ptr<MF::KernelizedMF<double>> kmf = std::make_unique<MF::KernelizedMF<double>>(
+  std::unique_ptr<MF::KernelizedMF<double>> mf = std::make_unique<MF::KernelizedMF<double>>(
     std::make_unique<Matrix<double>>(d), 5, 5, 0.001, 0.0002, KernelFunctions<double>::gaussianKernel
   );
 
-  kmf->execute(10);
+  // std::unique_ptr<MF::MatrixFactorization<double>> mf = std::make_unique<MF::MatrixFactorization>(
+  //   std::make_unique<Matrix<double>>(d), 5
+  // );
 
-  TMatrix P = kmf->getPMatrix();
-  TMatrix Q = kmf->getQMatrix();
+  mf->execute(20);
+
+  TMatrix P = mf->getPMatrix();
+  TMatrix Q = mf->getQMatrix();
 
   outputCSV("P.csv", P);
   outputCSV("Q.csv", Q);

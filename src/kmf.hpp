@@ -47,32 +47,36 @@ namespace MF {
       initializeGramMatrix(); // グラム行列の初期化
     }
 
-    void execute(int const iteration, const bool verbose = true) {
+    void execute(const int iteration) {
       for(std::size_t itr = 0; itr < iteration; ++itr) {
-        double rmse = 0;
+        std::cout << "=====================================================" << std::endl;
+        std::cout << "Iteration: " << itr + 1 << std::endl;
+
+        double sum_error = 0;
+        std::uint32_t rated = 0;
+
         #pragma omp parallel for
         for(std::size_t u = 0; u < matrixRRowNum; ++u) {
+          std::cout << u << std::endl;
           #pragma omp parallel for
           for(std::size_t i = 0; i < matrixRColNum; ++i) {
-            if(matrix->getMatrixElem(u, i) == 0)
-              continue;
-
             std::vector<Type> a_u = A->getMatrixCol(u);
             std::vector<Type> b_i = B->getMatrixCol(i);
+            Type real_value = matrix->getMatrixElem(u, i);
             Type expected_value = a_u*K->getMatrix()*b_i;
             
-            Type error = matrix->getMatrixElem(u, i) - expected_value;
-            rmse += error;  
-            update(a_u, b_i, u, i, error);
+            if(real_value != 0){
+              Type error = real_value - expected_value;
+              sum_error += std::pow(error, 2);
+              update(a_u, b_i, u, i, error);
+              rated++;
+            }
           }
         }
 
-        rmse = std::sqrt(rmse / (matrix->colNum * matrix->rowNum));
-        if (verbose) {
-          std::cout << "=====================================================" << std::endl;
-          std::cout << "Iteration: " << itr + 1 << std::endl;
-          std::cout << "RMSE: " << rmse << std::endl;
-        }
+        double rmse = std::sqrt(sum_error/rated);
+        std::cout << "RMSE: " << rmse << std::endl;
+        std::cout << "=====================================================" << std::endl;
       }
     }
 
