@@ -37,8 +37,8 @@ namespace MF {
       Q = std::make_unique<Matrix<Type>>(matrixRColNum, k);
       
       // == 補助変数 ==
-      A = std::make_unique<Matrix<Type>>(k, matrixRColNum);
-      B = std::make_unique<Matrix<Type>>(k, matrixRRowNum);
+      A = std::make_unique<Matrix<Type>>(k, matrixRRowNum);
+      B = std::make_unique<Matrix<Type>>(k, matrixRColNum);
       // == 補助変数 ==
 
       D = std::make_unique<Matrix<Type>>(d, k); // 論文中における「Dictionary vector」
@@ -56,12 +56,13 @@ namespace MF {
           for(std::size_t i = 0; i < matrixRColNum; ++i) {
             if(matrix->getMatrixElem(u, i) == 0)
               continue;
-            
-            std::vector<Type> a_u = A->getMatrixRow(u);
-            std::vector<Type> b_i = B->getMatrixRow(i);
+
+            std::vector<Type> a_u = A->getMatrixCol(u);
+            std::vector<Type> b_i = B->getMatrixCol(i);
             Type expected_value = a_u*K->getMatrix()*b_i;
+            
             Type error = matrix->getMatrixElem(u, i) - expected_value;
-            rmse += error;
+            rmse += error;  
             update(a_u, b_i, u, i, error);
           }
         }
@@ -75,15 +76,15 @@ namespace MF {
       }
     }
 
-    void update(const std::vector<Type> _a_u, const std::vector<Type> _b_i, const int _u, const int _i, const Type error){
+    void update(const std::vector<Type>& _a_u, const std::vector<Type>& _b_i, const int _u, const int _i, const Type error){
       for(size_t j = 0; j < k; ++j) {
         A->changeElem(
           j, _u, 
-          A->getMatrixElem(j, _u)+learning_rate*2*error*K->getMatrixRow(j)*_b_i
+          A->getMatrixElem(j, _u)+learning_rate*2*error*K->getMatrixCol(j)*_b_i
         );
         B->changeElem(
           j, _i,
-          B->getMatrixElem(j, _i)+learning_rate*2*error*K->getMatrixCol(j)*_a_u
+          B->getMatrixElem(j, _i)+learning_rate*2*error*K->getMatrixRow(j)*_a_u
         );
       }
     }
@@ -99,7 +100,7 @@ namespace MF {
         for(std::size_t j = 0; j < k; ++j) {
           K->changeElem(i, j, kernelFunction(
             D->getMatrixCol(i),
-            D->getMatrixCol(i)
+            D->getMatrixCol(j)
           ));
         }
       }
