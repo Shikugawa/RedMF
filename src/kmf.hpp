@@ -25,7 +25,8 @@ namespace MF {
   public:  
     KernelizedMF(std::unique_ptr<Matrix<Type>> m, const int _k, const int _d,
                  const double _lambda, const double _learning_rate, std::array<kFType, KERNEL_NUM> _func):
-                 k(_k), d(_d), lambda(_lambda), learning_rate(_learning_rate) {
+                 d(_d), lambda(_lambda), learning_rate(_learning_rate) {
+      k = _k;
       matrix = std::move(m);
       matrixRRowNum = matrix->rowNum;
       matrixRColNum = matrix->colNum;
@@ -39,7 +40,7 @@ namespace MF {
       // == 補助変数 ==
 
       D = std::make_shared<Matrix<Type>>(d, k); // 論文中における「Dictionary vector)
-      multi_kernel = std::make_unique<MultiKernel<Type, KERNEL_NUM>(_func, k); // マルチカーネルの初期化 
+      multi_kernel = std::make_unique<MultiKernel<Type, KERNEL_NUM>>(_func, k); // マルチカーネルの初期化 
     }
 
     void execute(const int iteration) {
@@ -58,9 +59,20 @@ namespace MF {
             std::vector<Type> a_u = A->getMatrixCol(u);
             std::vector<Type> b_i = B->getMatrixCol(i);
             Type real_value = matrix->getMatrixElem(u, i);
-            Type expected_value = a_u*K->getMatrix()*b_i;
             
             if(real_value != 0){
+              auto _single_kernels = multi_kernel->single_kernels;
+              auto _kernel_weights = multi_kernel->kernel_weights;
+              std::vector<std::vector<Type>> _K;
+
+              for(std::size_t i = 0; i < _kernel_weights.size(); ++i) {
+                if(i == 0) {
+                  _K = _kernel_weights[i]*_single_kernels[i]->K->getMatrix();
+                }
+                _K = _K + _kernel_weights[i]*_single_kernels[i]->K->getMatrix();
+              }
+
+              Type expected_value = a_u*_K*b_i;
               Type error = real_value - expected_value;
               sum_error += std::pow(error, 2);
               update(a_u, b_i, u, i, error);
@@ -92,7 +104,7 @@ namespace MF {
         );
         B->changeElem(
           j, _i,
-          B->getMatrixElem(j, _i)+learning_rate*2*error*K->getMatrixRow(j)*_a_u
+          B->getMatrixElem(j, _i)+learning_rate*2*error*multi_kernel->K->getMatrixRow(j)*_a_u
         );
       }
     }
@@ -100,7 +112,7 @@ namespace MF {
   private:
     std::uint8_t d;
     double lambda, learning_rate;
-    std::shared_ptr<Matrix<Type>> A, B;
+    std::shared_ptr<Matrix<Type>> A, B, D;
     std::unique_ptr<MultiKernel<Type, KERNEL_NUM>> multi_kernel;
   };
 };

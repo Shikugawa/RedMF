@@ -5,9 +5,10 @@
 #include <array>
 #include "vec.hpp"
 #include "matrix.hpp"
+#include "single_Kernel.hpp"
 
 template <typename T>
-using kernelFuncType = std::function<T(std::vector<T>, std::vector<T>);
+using kernelFuncType = std::function<T(std::vector<T>, std::vector<T>)>;
 
 template <typename T, int KERNEL_NUM>
 class MultiKernel {
@@ -16,13 +17,15 @@ class MultiKernel {
 public:
   std::size_t k, p;
   std::shared_ptr<Matrix<T>> D;
-  
+  std::array<std::shared_ptr<SingleKernel<T>>, KERNEL_NUM> single_kernels;
+  std::array<double, KERNEL_NUM> kernel_weights;
+
   MultiKernel(std::shared_ptr<Matrix<T>>& _D, std::array<kernelFuncType<T>, KERNEL_NUM> _kernel_functions, const int _k):
               k(_k), D(_D) {
     p = _kernel_functions.size();
 
     for(size_t i = 0; i < p; ++i) {
-      single_kernels[i] = std::make_unique<SingleKernel<T>>(_kernel_functions[i], D);
+      single_kernels[i] = std::make_shared<SingleKernel<T>>(_kernel_functions[i], D, k);
       kernel_weights[i] = 1/p;
     }
 
@@ -50,7 +53,7 @@ public:
     }
   }
 
-  void calcZ(std::size_t user_num, std::size_t item_num, double _lambda, double real_value
+  void calcZ(std::size_t user_num, std::size_t item_num, double _lambda, double real_value,
              std::shared_ptr<Matrix<T>>& _A, std::shared_ptr<Matrix<T>>& _B) {
     std::vector<T> _z;
     for(std::size_t user = 0; user < user_num; ++user) {
@@ -73,31 +76,4 @@ public:
 private:
   std::unique_ptr<Matrix<T>> Y;
   std::vector<T> Z;
-  std::array<double, KERNEL_NUM> kernel_weights;
-  std::array<std::unique_ptr<SingleKernel<T>>, KERNEL_NUM> single_kernels;
-};
-
-template <typename T>
-class SingleKernel {
-public:
-  kernelFuncType<T> kernel_func;
-  std::unique_ptr<Matrix<T>> K;
-  
-  SingleKernel(kernelFuncType<T> _kernel_func, std::shared_ptr<Matrix<T>>& D): kernel_func(_kernel_func) {
-    K = std::make_unique<Matrix<T>>(k, k);
-    calcGramMatrix(_D);
-  }
-
-private:
-  void calcGramMatrix(std::shared_ptr<Matrix<T>>& _D) {
-    for(std::size_t i = 0; i < k; ++i) {
-      for(std::size_t j = 0; j < k; ++j) {
-        auto gramMatrixElem = kernel_func(
-          _D->getMatrixCol(i),
-          _D->getMatrixCol(j) 
-        );
-        K->changeElem(i, j, gramMatrixElem);
-      }
-    }
-  }
 };
