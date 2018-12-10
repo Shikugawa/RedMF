@@ -5,9 +5,11 @@
 #include <sstream>
 #include <utility>
 #include <iterator>
+#include <array>
 // #include "src/mf.hpp"
 #include "src/kmf.hpp"
 #include "lib/kernel.hpp"
+#include "lib/kernel_functions.hpp"
 
 using TMatrix = std::vector<std::vector<double>>;
 
@@ -54,8 +56,9 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  std::unique_ptr<MF::KernelizedMF<double>> mf = std::make_unique<MF::KernelizedMF<double>>(
-    std::make_unique<Matrix<double>>(d), 5, 5, 0.001, 0.0002, KernelFunctions<double>::gaussianKernel
+  std::array<std::function<double(std::vector<double>, std::vector<double>)>, 2> func = {KernelFunctions<double>::gaussianKernel, KernelFunctions<double>::gaussianKernel};
+  std::unique_ptr<MF::KernelizedMF<double, 2>> mf = std::make_unique<MF::KernelizedMF<double, 2>>(
+    std::make_unique<Matrix<double>>(d), 5, 5, 0.001, 0.0002, func
   );
 
   // std::unique_ptr<MF::MatrixFactorization<double>> mf = std::make_unique<MF::MatrixFactorization>(

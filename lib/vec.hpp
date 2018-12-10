@@ -2,6 +2,18 @@
 #include <cmath>
 #include <vector>
 #include <exception>
+#include <random>
+
+std::vector<double> initRandomVector(std::size_t d) {
+  std::vector<double> result;
+  std::random_device rnd;
+  std::mt19937 mt(rnd());
+  std::uniform_int_distribution<> rand(0, 1);
+  for(std::size_t i = 0; i < d; ++i) {
+    result.emplace_back(rand(mt));
+  }
+  return result;
+}
 
 template <typename T>
 T norm(const std::vector<T>& a) {

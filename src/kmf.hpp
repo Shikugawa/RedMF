@@ -4,12 +4,13 @@
 #include <functional>
 #include "mfbase.hpp"
 #include "../lib/vec.hpp"
+#include "../lib/kernel.hpp"
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
 namespace MF {
-  template<typename Type>
+  template<typename Type, int KERNEL_NUM>
   class KernelizedMF : public MFBase<Type> {
     using kFType = std::function<Type(std::vector<Type>, std::vector<Type>)>;
     using TMatrix = std::vector<std::vector<Type>>;
@@ -21,30 +22,24 @@ namespace MF {
     using MFBase<Type>::matrixRColNum;
     using MFBase<Type>::matrixRRowNum;
 
-  public:
+  public:  
     KernelizedMF(std::unique_ptr<Matrix<Type>> m, const int _k, const int _d,
-                 const double _lambda, const double _learning_rate, kFType _kF) {
+                 const double _lambda, const double _learning_rate, std::array<kFType, KERNEL_NUM> _func):
+                 k(_k), d(_d), lambda(_lambda), learning_rate(_learning_rate) {
       matrix = std::move(m);
-      k = _k;
-      d = _d;
-      lambda = _lambda;
-      learning_rate = _learning_rate;
       matrixRRowNum = matrix->rowNum;
       matrixRColNum = matrix->colNum;
-      kernelFunction = _kF;
 
       P = std::make_unique<Matrix<Type>>(matrixRRowNum, k);
       Q = std::make_unique<Matrix<Type>>(matrixRColNum, k);
       
       // == 補助変数 ==
-      A = std::make_unique<Matrix<Type>>(k, matrixRRowNum);
-      B = std::make_unique<Matrix<Type>>(k, matrixRColNum);
+      A = std::make_shared<Matrix<Type>>(k, matrixRRowNum);
+      B = std::make_shared<Matrix<Type>>(k, matrixRColNum);
       // == 補助変数 ==
 
-      D = std::make_unique<Matrix<Type>>(d, k); // 論文中における「Dictionary vector」
-      K = std::make_unique<Matrix<Type>>(k, k); // TODO: Citrus::Linear側で初期化時に実行する関数を渡す機能を実装する
-
-      initializeGramMatrix(); // グラム行列の初期化
+      D = std::make_shared<Matrix<Type>>(d, k); // 論文中における「Dictionary vector)
+      multi_kernel = std::make_unique<MultiKernel<Type, KERNEL_NUM>(_func, k); // マルチカーネルの初期化 
     }
 
     void execute(const int iteration) {
@@ -69,6 +64,14 @@ namespace MF {
               Type error = real_value - expected_value;
               sum_error += std::pow(error, 2);
               update(a_u, b_i, u, i, error);
+
+              // == update kernel weight ==
+              multi_kernel->calcY(matrixRRowNum, matrixRColNum, A, B);
+              multi_kernel->calcZ(matrixRRowNum, matrixRColNum, lambda, real_value, A, B);
+              // Solve Quadratic Problem
+              
+              // == update kernel weight ==
+
               rated++;
             }
           }
@@ -80,11 +83,12 @@ namespace MF {
       }
     }
 
-    void update(const std::vector<Type>& _a_u, const std::vector<Type>& _b_i, const int _u, const int _i, const Type error){
+    void update(const std::vector<Type>& _a_u, const std::vector<Type>& _b_i, 
+                const int _u, const int _i, const Type error){
       for(size_t j = 0; j < k; ++j) {
         A->changeElem(
           j, _u, 
-          A->getMatrixElem(j, _u)+learning_rate*2*error*K->getMatrixCol(j)*_b_i
+          A->getMatrixElem(j, _u)+learning_rate*2*error*multi_kernel->K->getMatrixCol(j)*_b_i
         );
         B->changeElem(
           j, _i,
@@ -96,18 +100,7 @@ namespace MF {
   private:
     std::uint8_t d;
     double lambda, learning_rate;
-    std::unique_ptr<Matrix<Type>> A, B, D, K;
-    kFType kernelFunction;
-
-    void initializeGramMatrix() {
-      for(std::size_t i = 0; i < k; ++i) {
-        for(std::size_t j = 0; j < k; ++j) {
-          K->changeElem(i, j, kernelFunction(
-            D->getMatrixCol(i),
-            D->getMatrixCol(j)
-          ));
-        }
-      }
-    }
+    std::shared_ptr<Matrix<Type>> A, B;
+    std::unique_ptr<MultiKernel<Type, KERNEL_NUM>> multi_kernel;
   };
 };
