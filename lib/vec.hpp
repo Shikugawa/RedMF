@@ -62,6 +62,19 @@ std::vector<T> operator+(const std::vector<T>& a, const std::vector<T>& b) {
 }
 
 template <typename T>
+std::vector<std::vector<T>> operator+(std::vector<std::vector<T>> lope, std::vector<std::vector<T>> rope) {
+  std::vector<std::vector<T>> result;
+  for(size_t i = 0; i < lope.size(); ++i){
+    std::vector<T> tmp;
+    for(size_t j = 0; j < lope[0].size(); ++j){
+      tmp.emplace_back(lope[i][j] + rope[i][j]);
+    }
+    result.emplace_back(tmp);
+  }
+  return result;
+}
+
+template <typename T>
 std::vector<T> operator*(const std::vector<T>& a, const std::vector<std::vector<T>>& b) {
   std::vector<T> result;
   for(size_t i = 0; i < b[0].size(); ++i){
@@ -88,7 +101,7 @@ std::vector<T> operator*(const std::vector<std::vector<T>>& a, const std::vector
 }
 
 template <typename T>
-std::vector<std::vector<T>> operator*(const T a, std::vector<std::vector<T>>& b) {
+std::vector<std::vector<T>> operator*(double a, std::vector<std::vector<T>> b) {
   std::vector<std::vector<T>> result;
   for(size_t i = 0; i < b.size(); ++i){
     std::vector<T> r;

@@ -40,7 +40,7 @@ namespace MF {
       // == 補助変数 ==
 
       D = std::make_shared<Matrix<Type>>(d, k); // 論文中における「Dictionary vector)
-      multi_kernel = std::make_unique<MultiKernel<Type, KERNEL_NUM>>(_func, k); // マルチカーネルの初期化 
+      multi_kernel = std::make_unique<MultiKernel<Type, KERNEL_NUM>>(D, _func, k); // マルチカーネルの初期化 
     }
 
     void execute(const int iteration) {
@@ -63,7 +63,7 @@ namespace MF {
             if(real_value != 0){
               auto _single_kernels = multi_kernel->single_kernels;
               auto _kernel_weights = multi_kernel->kernel_weights;
-              std::vector<std::vector<Type>> _K;
+              TMatrix _K;
 
               for(std::size_t i = 0; i < _kernel_weights.size(); ++i) {
                 if(i == 0) {
@@ -75,7 +75,7 @@ namespace MF {
               Type expected_value = a_u*_K*b_i;
               Type error = real_value - expected_value;
               sum_error += std::pow(error, 2);
-              update(a_u, b_i, u, i, error);
+              update(a_u, b_i, new Matrix<Type>(_K), u, i, error);
 
               // == update kernel weight ==
               multi_kernel->calcY(matrixRRowNum, matrixRColNum, A, B);
@@ -95,18 +95,20 @@ namespace MF {
       }
     }
 
-    void update(const std::vector<Type>& _a_u, const std::vector<Type>& _b_i, 
+    void update(const std::vector<Type>& _a_u, const std::vector<Type>& _b_i, Matrix<Type>*&& K,
                 const int _u, const int _i, const Type error){
       for(size_t j = 0; j < k; ++j) {
         A->changeElem(
           j, _u, 
-          A->getMatrixElem(j, _u)+learning_rate*2*error*multi_kernel->K->getMatrixCol(j)*_b_i
+          A->getMatrixElem(j, _u)+learning_rate*2*error*K->getMatrixCol(j)*_b_i
         );
         B->changeElem(
           j, _i,
-          B->getMatrixElem(j, _i)+learning_rate*2*error*multi_kernel->K->getMatrixRow(j)*_a_u
+          B->getMatrixElem(j, _i)+learning_rate*2*error*K->getMatrixRow(j)*_a_u
         );
       }
+
+      delete K;
     }
 
   private:

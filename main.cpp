@@ -6,6 +6,7 @@
 #include <utility>
 #include <iterator>
 #include <array>
+#include <functional>
 // #include "src/mf.hpp"
 #include "src/kmf.hpp"
 #include "lib/kernel.hpp"

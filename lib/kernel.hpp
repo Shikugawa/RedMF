@@ -19,6 +19,19 @@ public:
   std::shared_ptr<Matrix<T>> D;
   std::array<std::shared_ptr<SingleKernel<T>>, KERNEL_NUM> single_kernels;
   std::array<double, KERNEL_NUM> kernel_weights;
+  
+  // FIXME: use opearator* from Citrus::Linear::Vector class
+  std::function<TMatrix(std::vector<T>, std::vector<T>)> calc = [](std::vector<T> a, std::vector<T> b){
+    TMatrix result;
+    for(std::size_t i = 0; i < a.size(); ++i) {
+      std::vector<T> tmp;
+      for(std::size_t j = 0; j < b.size(); ++j) {
+        tmp.emplace_back(a[i]*b[j]);
+      }
+      result.emplace_back(tmp);
+    }
+    return result;
+  };
 
   MultiKernel(std::shared_ptr<Matrix<T>>& _D, std::array<kernelFuncType<T>, KERNEL_NUM> _kernel_functions, const int _k):
               k(_k), D(_D) {
@@ -42,7 +55,7 @@ public:
           v_ui.emplace_back(_A->getMatrixCol(user)*single_kernels[i]->K->getMatrix()*_B->getMatrixRow(item));
         }
 
-        y = y + v_ui*v_ui;
+        y = y + calc(v_ui, v_ui);
       }
     }
 
