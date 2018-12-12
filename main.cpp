@@ -40,7 +40,7 @@ void outputCSV(std::string const fileName, TMatrix& m) {
 
 int main(int argc, char const *argv[]) {
   TMatrix d;
-  // TMatrix d = {
+  // d = {
   //   {1.0, 4.2, 0.0, 1.9, 2.3},
   //   {2.3, 5.6, 6.3, 0.0, 0.0},
   //   {0.0, 0.0, 2.5, 2.3, 0.0},

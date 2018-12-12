@@ -5,9 +5,6 @@
 #include "mfbase.hpp"
 #include "../lib/vec.hpp"
 #include "../lib/kernel.hpp"
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
 namespace MF {
   template<typename Type, int KERNEL_NUM>
@@ -51,10 +48,7 @@ namespace MF {
         double sum_error = 0;
         std::uint32_t rated = 0;
 
-        #pragma omp parallel for
         for(std::size_t u = 0; u < matrixRRowNum; ++u) {
-          std::cout << u << std::endl;
-          #pragma omp parallel for
           for(std::size_t i = 0; i < matrixRColNum; ++i) {
             std::vector<Type> a_u = A->getMatrixCol(u);
             std::vector<Type> b_i = B->getMatrixCol(i);
@@ -69,6 +63,7 @@ namespace MF {
                 if(i == 0) {
                   _K = _kernel_weights[i]*_single_kernels[i]->K->getMatrix();
                 }
+
                 _K = _K + _kernel_weights[i]*_single_kernels[i]->K->getMatrix();
               }
 
@@ -81,7 +76,6 @@ namespace MF {
               multi_kernel->calcY(matrixRRowNum, matrixRColNum, A, B);
               multi_kernel->calcZ(matrixRRowNum, matrixRColNum, lambda, real_value, A, B);
               // Solve Quadratic Problem
-              
               // == update kernel weight ==
 
               rated++;

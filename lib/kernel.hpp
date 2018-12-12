@@ -7,6 +7,10 @@
 #include "matrix.hpp"
 #include "single_Kernel.hpp"
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 template <typename T>
 using kernelFuncType = std::function<T(std::vector<T>, std::vector<T>)>;
 
@@ -36,10 +40,9 @@ public:
   MultiKernel(std::shared_ptr<Matrix<T>>& _D, std::array<kernelFuncType<T>, KERNEL_NUM> _kernel_functions, const int _k):
               k(_k), D(_D) {
     p = _kernel_functions.size();
-
     for(size_t i = 0; i < p; ++i) {
       single_kernels[i] = std::make_shared<SingleKernel<T>>(_kernel_functions[i], D, k);
-      kernel_weights[i] = 1/p;
+      kernel_weights[i] = 1.0/p;
     }
 
     Y = std::make_unique<Matrix<T>>(p, p);
@@ -48,14 +51,16 @@ public:
 
   void calcY(std::size_t user_num, std::size_t item_num, std::shared_ptr<Matrix<T>>& _A, std::shared_ptr<Matrix<T>>& _B) {
     TMatrix y;
+
+    // #pragma omp parallel for
     for(std::size_t user = 0; user < user_num; ++user) {
       for(std::size_t item = 0; item < item_num; ++item) {
         std::vector<T> v_ui;
         for(std::size_t i = 0; i < p; ++i) {
-          v_ui.emplace_back(_A->getMatrixCol(user)*single_kernels[i]->K->getMatrix()*_B->getMatrixRow(item));
+          v_ui.emplace_back(_A->getMatrixCol(user)*single_kernels[i]->K->getMatrix()*_B->getMatrixCol(item));
         }
-
         y = y + calc(v_ui, v_ui);
+        std::cout << user << " " << item << std::endl;
       }
     }
 
