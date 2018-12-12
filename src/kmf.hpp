@@ -49,6 +49,7 @@ namespace MF {
         std::uint32_t rated = 0;
 
         for(std::size_t u = 0; u < matrixRRowNum; ++u) {
+          std::cout << "Optimizing User: " << u << std::endl;
           for(std::size_t i = 0; i < matrixRColNum; ++i) {
             std::vector<Type> a_u = A->getMatrixCol(u);
             std::vector<Type> b_i = B->getMatrixCol(i);

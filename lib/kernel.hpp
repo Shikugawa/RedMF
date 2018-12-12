@@ -60,7 +60,6 @@ public:
           v_ui.emplace_back(_A->getMatrixCol(user)*single_kernels[i]->K->getMatrix()*_B->getMatrixCol(item));
         }
         y = y + calc(v_ui, v_ui);
-        std::cout << user << " " << item << std::endl;
       }
     }
 
@@ -79,7 +78,7 @@ public:
         std::vector<T> gamma_ui;
         for(std::size_t i = 0; i < p; ++i) {
           auto left = _A->getMatrixCol(user)*single_kernels[i]->K->getMatrix()*_A->getMatrixCol(user);
-          auto right = _B->getMatrixRow(item)*single_kernels[i]->K->getMatrix()*_B->getMatrixRow(item);
+          auto right = _B->getMatrixCol(item)*single_kernels[i]->K->getMatrix()*_B->getMatrixCol(item);
           auto value = left + right;
           gamma_ui.emplace_back(value);
         }
