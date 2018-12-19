@@ -52,8 +52,9 @@ public:
   void calcY(std::size_t user_num, std::size_t item_num, std::shared_ptr<Matrix<T>>& _A, std::shared_ptr<Matrix<T>>& _B) {
     TMatrix y;
 
-    // #pragma omp parallel for
+    #pragma omp parallel for
     for(std::size_t user = 0; user < user_num; ++user) {
+      #pragma omp parallel for
       for(std::size_t item = 0; item < item_num; ++item) {
         std::vector<T> v_ui;
         for(std::size_t i = 0; i < p; ++i) {
@@ -73,7 +74,10 @@ public:
   void calcZ(std::size_t user_num, std::size_t item_num, double _lambda, double real_value,
              std::shared_ptr<Matrix<T>>& _A, std::shared_ptr<Matrix<T>>& _B) {
     std::vector<T> _z;
+
+    #pragma omp parallel for
     for(std::size_t user = 0; user < user_num; ++user) {
+      #pragma omp parallel for
       for(std::size_t item = 0; item < item_num; ++item) {
         std::vector<T> gamma_ui;
         for(std::size_t i = 0; i < p; ++i) {
