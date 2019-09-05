@@ -2,13 +2,13 @@
 #include <cmath>
 #include <iostream>
 #include "mfbase.hpp"
-#include "../lib/vec.hpp"
+#include "../lib/linear/vec.hpp"
 
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
-namespace MF {
+namespace RedMF::Factorization {
   template<typename Type>
   class MatrixFactorization : public MFBase<Type> {
     using TMatrix = std::vector<std::vector<Type>>;

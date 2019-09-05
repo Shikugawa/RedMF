@@ -2,13 +2,13 @@
 #include <cmath>
 #include <iostream>
 #include "mfbase.hpp"
-#include "../lib/vec.hpp"
+#include "../lib/linear/vec.hpp"
 
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
-namespace MF {
+namespace RedMF::Factorzation {
   template<typename Type>
   class NMF : public MFBase<Type> {
     using TMatrix = std::vector<std::vector<Type>>;
@@ -58,7 +58,7 @@ namespace MF {
 
     void update(double const expected, 
                 int const _u, int const _i, 
-                std::vector<Type> p, std::vector<Type> q) {
+                const std::vector<Type>& p, const std::vector<Type>& q) {
       for(size_t k = 0; k < k; ++k) {
         double sum1 = 0;
         double sum2 = 0;

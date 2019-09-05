@@ -1,6 +1,6 @@
 #pragma once
-#include "../lib/matrix.hpp"
-#include "../lib/vec.hpp"
+#include "../lib/lienar/matrix.hpp"
+#include "../lib/linear/vec.hpp"
 #include <cmath>
 #include <vector>
 #include <memory>

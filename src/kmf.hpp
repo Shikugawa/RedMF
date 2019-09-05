@@ -3,10 +3,10 @@
 #include <iostream>
 #include <functional>
 #include "mfbase.hpp"
-#include "../lib/vec.hpp"
-#include "../lib/kernel.hpp"
+#include "../lib/linear/vec.hpp"
+#include "../lib/linear/kernel.hpp"
 
-namespace MF {
+namespace RedMF::Factorization {
   template<typename Type, int KERNEL_NUM>
   class KernelizedMF : public MFBase<Type> {
     using kFType = std::function<Type(std::vector<Type>, std::vector<Type>)>;
